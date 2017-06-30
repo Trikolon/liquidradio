@@ -13,7 +13,6 @@ const app = new Vue({
             el: "streamEl"
         },
         twitterFeed: {
-            heading: "Tweets by @thecoffeepanda",
             profile: "https://twitter.com/thecoffeepanda",
             theme: "dark"
         },
