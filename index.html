@@ -28,7 +28,7 @@
                       :theme="twitterFeed.theme"></twitter-feed>
         <div id="streamCtrl">
             <audio ref="streamEl" v-bind:src="stream.src" v-bind:type="stream.type">{{notSupportedMessage}}</audio>
-            <md-button class="md-fab md-primary" v-on:click="stream.play=!stream.play">
+            <md-button class="md-fab md-primary" :disabled="stream.offline" v-on:click="stream.play=!stream.play">
                 <md-icon>{{stream.play ? "pause" : "play_arrow"}}</md-icon>
             </md-button>
             <md-button class="md-fab" v-on:click="catchUp()">
