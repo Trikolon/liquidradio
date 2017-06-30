@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CFP Radio</title>
 
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <link rel="stylesheet" href="css/coffee.css">
-
+    <!-- external -->
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
     <script src="https://unpkg.com/vue"></script>
-    <!--<script src="https://unpkg.com/vue-typer/dist/vue-typer.min.js"></script>-->
+    <link rel="stylesheet" href="lib/vue-material/vue-material.css">
+    <script src="lib/vue-material/vue-material.js"></script>
+
+    <!-- custom -->
+    <link rel="stylesheet" href="css/coffee.css">
     <script src="js/vue-twitter-feed.js"></script>
 </head>
 <body>
@@ -17,8 +21,12 @@
     <div id="streamCtrl">
         <audio ref="streamEl" v-bind:src="stream.src" v-bind:type="stream.type">{{notSupportedMessage}}</audio>
         <div id="status">{{stream.play ? "Aaaand we're live" : "Hold on..."}}</div>
-        <input type="button" v-on:click="stream.play=!stream.play" v-model="stream.play">
-        <input type="button" v-on:click="catchUp()" value="Catch up">
+        <md-button class="md-icon-button md-raised md-primary"  v-on:click="stream.play=!stream.play">
+            <md-icon>{{stream.play ? "pause" : "play_arrow"}}</md-icon>
+        </md-button>
+        <md-button class="md-icon-button md-raised md-accent" v-on:click="catchUp()">
+            <md-icon>fast_forward</md-icon>
+        </md-button>
     </div>
     <twitter-feed height="500" width="50vw" :heading="twitterFeed.heading" :profile="twitterFeed.profile"
                   :theme="twitterFeed.theme"></twitter-feed>
