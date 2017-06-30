@@ -30,8 +30,8 @@ const app = new Vue({
     },
     methods: {
         /**
-         * Trigger play or pause for audio el depending on state
-         * @param state - true if play, false if pause
+         * Trigger play or pause for audio el depending on state.
+         * @param state - true if play, false if pause.
          */
         updatePlayState: function (state) {
             const el = this.$refs[this.stream.el];
@@ -47,7 +47,7 @@ const app = new Vue({
             }
         },
         /**
-         * Reloads audio el to catch up in stream
+         * Reloads audio element to catch up in stream.
          */
         catchUp: function () {
             const el = this.$refs[this.stream.el];
@@ -59,6 +59,11 @@ const app = new Vue({
                 this.stream.play = true;
             }
         },
+        /**
+         * Shows notification
+         * @param message - Text for notification.
+         * @param duration - Duration of visibility.
+         */
         notify: function (message, duration) {
             const el = this.$refs[this.notification.el];
             if (duration) {
