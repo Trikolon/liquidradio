@@ -14,13 +14,13 @@
 </head>
 <body>
 <div id="app">
-    <audio ref="streamEl" v-bind:src="stream.src" v-bind:type="stream.type">{{notSupportedMessage}}</audio>
-    <div id="status">{{stream.play ? "Aaaand we're live" : "Hold on..."}}</div>
-    <input type="button" v-on:click="stream.play=!stream.play" v-model="stream.play">
-    <input type="button" v-on:click="catchUp()" value="Catch up">
-
-
-    <twitter-feed :heading="twitterFeed.heading" :profile="twitterFeed.profile"
+    <div id="streamCtrl">
+        <audio ref="streamEl" v-bind:src="stream.src" v-bind:type="stream.type">{{notSupportedMessage}}</audio>
+        <div id="status">{{stream.play ? "Aaaand we're live" : "Hold on..."}}</div>
+        <input type="button" v-on:click="stream.play=!stream.play" v-model="stream.play">
+        <input type="button" v-on:click="catchUp()" value="Catch up">
+    </div>
+    <twitter-feed height="500" width="50vw" :heading="twitterFeed.heading" :profile="twitterFeed.profile"
                   :theme="twitterFeed.theme"></twitter-feed>
 </div>
 <script src="js/coffee.js"></script>
