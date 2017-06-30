@@ -10,6 +10,6 @@ body {
     justify-content: center;
     min-height: 80vh;
 }
-.twitter-timeline{
-    /*max-height: 40vh;*/
+#streamCtrl {
+    padding: 20px;
 }

@@ -1,3 +1,4 @@
+Vue.use(VueMaterial);
 const app = new Vue({
     el: "#app",
     data: {
