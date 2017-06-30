@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CFP Radio</title>
-    <script src="https://unpkg.com/vue"></script>
-    <!--<script src="https://unpkg.com/vue-typer/dist/vue-typer.min.js"></script>-->
+
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <link rel="stylesheet" href="css/coffee.css">
 
+    <script src="https://unpkg.com/vue"></script>
+    <!--<script src="https://unpkg.com/vue-typer/dist/vue-typer.min.js"></script>-->
+    <script src="js/vue-twitter-feed.js"></script>
 </head>
 <body>
 <div id="app">
@@ -18,8 +20,8 @@
     <input type="button" v-on:click="catchUp()" value="Catch up">
 
 
-    <a class="twitter-timeline" data-dnt="true" v-bind:data-theme="twitterFeed.theme" v-bind:href="twitterFeed.profile">
-        {{twitterFeed.heading}}</a>
+    <twitter-feed :heading="twitterFeed.heading" :profile="twitterFeed.profile"
+                  :theme="twitterFeed.theme"></twitter-feed>
 </div>
 <script src="js/coffee.js"></script>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
