@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CFP Radio</title>
+    <script src="https://unpkg.com/vue"></script>
+    <!--<script src="https://unpkg.com/vue-typer/dist/vue-typer.min.js"></script>-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="css/coffee.css">
+
+</head>
+<body>
+<div id="app">
+    <audio ref="streamEl" v-bind:src="stream.src" v-bind:type="stream.type">{{notSupportedMessage}}</audio>
+    <div id="status">{{stream.play ? "Aaaand we're live" : "Hold on..."}}</div>
+    <input type="button" v-on:click="stream.play=!stream.play" v-model="stream.play">
+    <input type="button" v-on:click="catchUp()" value="Catch up">
+</div>
+<script src="js/coffee.js"></script>
+</body>
+</html>
