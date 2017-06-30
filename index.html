@@ -14,22 +14,28 @@
 
     <!-- custom -->
     <link rel="stylesheet" href="css/coffee.css">
-    <script src="js/vue-twitter-feed.js"></script>
+    <script src="js/components.js"></script>
 </head>
 <body>
 <div id="app">
-    <div id="streamCtrl">
-        <audio ref="streamEl" v-bind:src="stream.src" v-bind:type="stream.type">{{notSupportedMessage}}</audio>
-        <div id="status">{{stream.play ? "Aaaand we're live" : "Hold on..."}}</div>
-        <md-button class="md-icon-button md-raised md-primary"  v-on:click="stream.play=!stream.play">
-            <md-icon>{{stream.play ? "pause" : "play_arrow"}}</md-icon>
-        </md-button>
-        <md-button class="md-icon-button md-raised md-accent" v-on:click="catchUp()">
-            <md-icon>fast_forward</md-icon>
-        </md-button>
+    <md-toolbar>
+        <h1 class="md-title">{{title}}</h1>
+    </md-toolbar>
+    <div class="main-content">
+        <twitter-feed height="500" :heading="twitterFeed.heading" :profile="twitterFeed.profile"
+                      :theme="twitterFeed.theme"></twitter-feed>
+        <div id="streamCtrl">
+            <audio ref="streamEl" v-bind:src="stream.src" v-bind:type="stream.type">{{notSupportedMessage}}</audio>
+            <md-button class="md-fab md-primary" v-on:click="stream.play=!stream.play">
+                <md-icon>{{stream.play ? "pause" : "play_arrow"}}</md-icon>
+            </md-button>
+            <md-button class="md-fab" v-on:click="catchUp()">
+                <md-icon>fast_forward</md-icon>
+            </md-button>
+        </div>
     </div>
-    <twitter-feed height="500" width="50vw" :heading="twitterFeed.heading" :profile="twitterFeed.profile"
-                  :theme="twitterFeed.theme"></twitter-feed>
+    <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration"><span>{{notification.message}}</span>
+    </md-snackbar>
 </div>
 <script src="js/coffee.js"></script>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
