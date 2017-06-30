@@ -7,6 +7,11 @@ const app = new Vue({
             type: "audio/mpeg",
             src: "http://equinox.shoutca.st:8702/;stream/1",
             el: "streamEl"
+        },
+        twitterFeed: {
+            heading: "Tweets by @thecoffeepanda",
+            profile: "https://twitter.com/thecoffeepanda",
+            theme: "dark"
         }
     },
     watch: {
@@ -31,6 +36,9 @@ const app = new Vue({
                 el.pause();
             }
         },
+        /**
+         * Reloads audio el to catch up in stream
+         */
         catchUp: function () {
             const el = this.$refs[this.stream.el];
             el.load();
