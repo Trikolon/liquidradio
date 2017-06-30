@@ -1,4 +1,4 @@
 Vue.component("twitter-feed", {
-    template: "<a class=\"twitter-timeline\" data-dnt=\"true\" :data-theme=\"theme\" :href=\"profile\">{{heading}}</a>",
-    props: ["theme", "profile", "heading"]
+    template: "<a class=\"twitter-timeline\" :data-width=\"width\" :data-height=\"height\" data-dnt=\"true\" :data-theme=\"theme\" :href=\"profile\">{{heading}}</a>",
+    props: ["theme", "profile", "heading", "width", "height"]
 });
