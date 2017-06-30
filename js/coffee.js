@@ -8,8 +8,9 @@ const app = new Vue({
         stream: {
             play: false,
             type: "audio/mpeg",
-            src: "http://equinox.shoutca.st:8702/;stream/1",
-            title: "Bassdrive",
+            src: "http://s45.myradiostream.com:12036/listen.mp3",
+            title: "CFP Radio",
+            offline: false,
             el: "streamEl"
         },
         twitterFeed: {
@@ -24,9 +25,18 @@ const app = new Vue({
         }
     },
     watch: {
-        'stream.play': function (state) {
+        "stream.play": function (state) {
             this.updatePlayState(state);
+        },
+        "stream.offline": function (state) {
+            if (state) {
+                this.stream.play = false;
+            }
         }
+    },
+    mounted: function () {
+        //Attach error handler to audio stream element
+        this.$refs[this.stream.el].addEventListener("error", this.streamError);
     },
     methods: {
         /**
@@ -37,13 +47,13 @@ const app = new Vue({
             const el = this.$refs[this.stream.el];
             log.debug("play state changed to", state);
             if (state) {
+                el.play();
                 log.debug("started stream");
                 this.notify("Now playing " + this.stream.title, 2000);
-                el.play();
             }
             else {
-                log.debug("stopped stream");
                 el.pause();
+                log.debug("stopped stream");
             }
         },
         /**
@@ -58,6 +68,30 @@ const app = new Vue({
             else {
                 this.stream.play = true;
             }
+            this.stream.offline = false;
+        },
+        streamError: function (e) {
+            log.error("Error in stream", e);
+            let msg = "Error: ";
+            switch (e.target.error.code) {
+                case e.target.error.MEDIA_ERR_ABORTED:
+                    msg += "Playback aborted by user.";
+                    break;
+                case e.target.error.MEDIA_ERR_NETWORK:
+                    msg += "Network error. Check your connection.";
+                    break;
+                case e.target.error.MEDIA_ERR_DECODE:
+                    msg += "Decoding error.";
+                    break;
+                case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                    msg += "Stream offline.";
+                    this.stream.offline = true;
+                    break;
+                default:
+                    msg += "Unkown error";
+                    break;
+            }
+            this.notify(msg);
         },
         /**
          * Shows notification
