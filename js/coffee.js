@@ -3,13 +3,13 @@ const app = new Vue({
     el: "#app",
     data: {
         loglevel: "INFO",
-        title: "CFP Radio",
+        title: "Liquid Radio",
         notSupportedMessage: "Your browser does not support audio streams, please update.",
         stream: {
             play: false,
             type: "audio/mpeg",
             src: "http://s45.myradiostream.com:12036/listen.mp3",
-            title: "CFP Radio",
+            title: "Liquid Radio",
             offline: false,
             el: "streamEl"
         },
