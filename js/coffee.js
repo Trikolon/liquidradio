@@ -2,6 +2,7 @@ Vue.use(VueMaterial);
 const app = new Vue({
     el: "#app",
     data: {
+        loglevel: "INFO",
         title: "CFP Radio",
         notSupportedMessage: "Your browser does not support audio streams, please update.",
         stream: {
@@ -35,14 +36,14 @@ const app = new Vue({
          */
         updatePlayState: function (state) {
             const el = this.$refs[this.stream.el];
-            console.debug("play state changed to", state);
+            log.debug("play state changed to", state);
             if (state) {
-                console.debug("started stream");
+                log.debug("started stream");
                 this.notify("Now playing " + this.stream.title, 2000);
                 el.play();
             }
             else {
-                console.debug("stopped stream");
+                log.debug("stopped stream");
                 el.pause();
             }
         },
@@ -74,3 +75,4 @@ const app = new Vue({
         }
     }
 });
+log.setDefaultLevel(app.loglevel);
