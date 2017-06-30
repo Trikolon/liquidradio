@@ -3,13 +3,25 @@ body {
     background-color: #3a4145;
     color: white;
 }
-#app{
+
+#app {
+}
+
+#streamCtrl {
+    z-index: 1;
+    padding: 20px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.twitter-timeline {
+    max-width: 400px !important;
+}
+
+.main-content {
+    padding: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 80vh;
-}
-#streamCtrl {
-    padding: 20px;
 }
