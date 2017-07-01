@@ -42,10 +42,17 @@
         </md-toolbar>
         <md-list>
             <!-- Station list -->
-            <md-list-item v-for="station in stream.stations" id="station.id" v-on:click="switchStation(station.id); toggleNav()" class="md-primary">
-                <md-icon>music_note</md-icon> <span>{{station.title}}</span>
+            <md-list-item class="md-primary">
+                <md-icon>music_note</md-icon> <span>Stations</span>
+                <md-list-expand>
+                    <md-list>
+                        <md-list-item class="md-inset" v-for="station in stream.stations" id="station.id" v-on:click="switchStation(station.id); toggleNav()">
+                            <span>{{station.title}}</span>
+                        </md-list-item>
+                    </md-list>
+                </md-list-expand>
             </md-list-item>
-
+            <md-divider class="md-inset"></md-divider>
             <md-list-item @click="toggleNav" :href="repoLink" class="md-primary">
                 <md-icon>code</md-icon><span>Source</span>
             </md-list-item>
