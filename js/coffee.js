@@ -5,6 +5,8 @@ const app = new Vue({
         loglevel: "INFO",
         title: "Liquid Radio",
         notSupportedMessage: "Your browser does not support audio streams, please update.",
+        repoLink: "https://github.com/Trikolon/cfp-radio",
+        version: "0.1",
         stream: {
             play: false,
             type: "audio/mpeg",
@@ -50,6 +52,12 @@ const app = new Vue({
         audioEl.addEventListener("error", this.streamError);
     },
     methods: {
+        /**
+         * Toggles visibility of left side navigation
+         */
+        toggleNav: function() {
+            this.$refs.nav.toggle();
+        },
         /**
          * Trigger play or pause for audio el depending on state.
          * @param state - true if play, false if pause.
