@@ -27,7 +27,6 @@
         <twitter-feed height="500" :heading="twitterFeed.heading" :profile="twitterFeed.profile"
                       :theme="twitterFeed.theme"></twitter-feed>
         <div id="streamCtrl">
-            <audio ref="streamEl" v-bind:src="stream.src" v-bind:type="stream.type">{{notSupportedMessage}}</audio>
             <md-button class="md-fab md-primary" :disabled="stream.offline" v-on:click="stream.play=!stream.play">
                 <md-icon>{{stream.play ? "pause" : "play_arrow"}}</md-icon>
             </md-button>
@@ -36,6 +35,7 @@
             </md-button>
         </div>
     </div>
+    <audio ref="streamEl" v-bind:src="stream.src" v-bind:type="stream.type">{{notSupportedMessage}}</audio>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration"><span>{{notification.message}}</span>
     </md-snackbar>
 </div>
