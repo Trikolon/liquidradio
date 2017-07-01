@@ -10,7 +10,7 @@ engines:
       - javascript
 ratings:
   paths:
-  - "js/**"
-  - "css/**"
+  - "**.js"
+  - "**.css"
 exclude_paths:
-- "lib/*"
+- "lib/"
