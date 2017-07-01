@@ -35,8 +35,19 @@ const app = new Vue({
         }
     },
     mounted: function () {
+        let audioEl = this.$refs[this.stream.el];
+
+        audioEl.addEventListener("play", () => {
+           this.stream.play = true;
+        });
+        audioEl.addEventListener("pause", () => {
+            this.stream.play = false;
+        });
+        audioEl.addEventListener("stalled", () => {
+            this.notify("Stream stalled, check your connection.");
+        });
         //Attach error handler to audio stream element
-        this.$refs[this.stream.el].addEventListener("error", this.streamError);
+        audioEl.addEventListener("error", this.streamError);
     },
     methods: {
         /**
@@ -85,12 +96,12 @@ const app = new Vue({
                     break;
                 case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
                     msg += "Stream offline.";
-                    this.stream.offline = true;
                     break;
                 default:
-                    msg += "Unkown error";
+                    msg += "Unknown error";
                     break;
             }
+            this.stream.offline = true;
             this.notify(msg);
         },
         /**
