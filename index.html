@@ -34,19 +34,23 @@
         <h1 class="md-title">{{title}}</h1>
     </md-toolbar>
     <md-sidenav class="md-left" ref="nav">
-        <md-toolbar class="md-medium">
+        <md-toolbar class="md-small">
             <div class="md-toolbar-container">
                 <h3 class="md-title">{{title}} <sup id="versionInfo">{{version}}</sup></h3>
-
+                <md-avatar class="md-avatar-icon">
+                    <md-icon>invert_colors</md-icon>
+                </md-avatar>
             </div>
         </md-toolbar>
         <md-list>
             <!-- Station list -->
             <md-list-item class="md-primary">
-                <md-icon>music_note</md-icon> <span>Stations</span>
+                <md-icon>music_note</md-icon>
+                <span>Stations</span>
                 <md-list-expand>
                     <md-list>
-                        <md-list-item class="md-inset" v-for="station in stream.stations" id="station.id" v-on:click="switchStation(station.id); toggleNav()">
+                        <md-list-item class="md-inset" v-for="station in stream.stations" id="station.id"
+                                      v-on:click="switchStation(station.id); toggleNav()">
                             <span>{{station.title}}</span>
                         </md-list-item>
                     </md-list>
@@ -54,7 +58,8 @@
             </md-list-item>
             <md-divider class="md-inset"></md-divider>
             <md-list-item @click="toggleNav" :href="repoLink" class="md-primary">
-                <md-icon>code</md-icon><span>Source</span>
+                <md-icon>code</md-icon>
+                <span>Source</span>
             </md-list-item>
         </md-list>
     </md-sidenav>
@@ -70,7 +75,9 @@
             <md-icon>fast_forward</md-icon>
         </md-button>
     </div>
-    <audio ref="streamEl" v-bind:src="stream.currentStation.src" v-bind:type="stream.currentStation.type">{{notSupportedMessage}}</audio>
+    <audio ref="streamEl" v-bind:src="stream.currentStation.src" v-bind:type="stream.currentStation.type">
+        {{notSupportedMessage}}
+    </audio>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration"><span>{{notification.message}}</span>
     </md-snackbar>
 </div>
