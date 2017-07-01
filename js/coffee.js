@@ -120,3 +120,4 @@ const app = new Vue({
     }
 });
 log.setDefaultLevel(app.loglevel);
+if("serviceWorker" in navigator) navigator.serviceWorker.register('js/service-worker.js');
