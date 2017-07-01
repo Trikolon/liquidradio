@@ -26,10 +26,32 @@
     <script src="js/components.js"></script>
 </head>
 <body>
-<div id="app">
+<div id="app" class="phone-viewport">
     <md-toolbar>
+        <md-button class="md-icon-button" @click="toggleNav">
+            <md-icon>menu</md-icon>
+        </md-button>
         <h1 class="md-title">{{title}}</h1>
     </md-toolbar>
+    <md-sidenav class="md-left" ref="nav">
+        <md-toolbar class="md-medium">
+            <div class="md-toolbar-container">
+                <h3 class="md-title">{{title}} <sup id="versionInfo">{{version}}</sup></h3>
+
+            </div>
+        </md-toolbar>
+        <md-list> <!-- TODO -->
+            <md-list-item @click="toggleNav" class="md-primary">
+                <md-icon>music_note</md-icon> <span>Liquid Radio</span>
+            </md-list-item>
+            <md-list-item @click="toggleNav" class="md-primary">
+                <md-icon>music_note</md-icon> <span>Bassdrive</span>
+            </md-list-item>
+            <md-list-item @click="toggleNav" :href="repoLink" class="md-primary">
+                <md-icon>code</md-icon><span>Source</span>
+            </md-list-item>
+        </md-list>
+    </md-sidenav>
     <div class="main-content">
         <twitter-feed height="500" :profile="twitterFeed.profile" :theme="twitterFeed.theme"></twitter-feed>
     </div>

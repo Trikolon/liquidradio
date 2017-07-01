@@ -4,9 +4,6 @@ body {
     color: white;
 }
 
-#app {
-}
-
 #streamCtrl {
     z-index: 1;
     padding: 20px;
@@ -26,4 +23,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+#versionInfo {
+    font-size: x-small;
 }
