@@ -22,7 +22,7 @@ const app = new Vue({
         notification: {
             message: "",
             duration: 4000,
-            position: "top center",
+            position: "bottom center",
             el: "notification-bar"
         }
     },
