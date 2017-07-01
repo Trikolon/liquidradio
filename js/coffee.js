@@ -85,12 +85,12 @@ const app = new Vue({
                     break;
                 case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
                     msg += "Stream offline.";
-                    this.stream.offline = true;
                     break;
                 default:
-                    msg += "Unkown error";
+                    msg += "Unknown error";
                     break;
             }
+            this.stream.offline = true;
             this.notify(msg);
         },
         /**
