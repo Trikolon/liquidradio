@@ -6,14 +6,26 @@ const app = new Vue({
         title: "Liquid Radio",
         notSupportedMessage: "Your browser does not support audio streams, please update.",
         repoLink: "https://github.com/Trikolon/cfp-radio",
-        version: "0.1",
+        version: "0.2",
         stream: {
             play: false,
-            type: "audio/mpeg",
-            src: "http://s45.myradiostream.com:12036/listen.mp3",
-            title: "Liquid Radio",
             offline: false,
-            el: "streamEl"
+            el: "streamEl",
+            currentStation: undefined,
+            stations: [
+                {
+                    id: "liquid_radio",
+                    type: "audio/mpeg",
+                    src: "http://s45.myradiostream.com:12036/listen.mp3",
+                    title: "Liquid Radio"
+                },
+                {
+                    id: "bassdrive",
+                    type: "audio/mpeg",
+                    src: "http://equinox.shoutca.st:8702/;stream/1",
+                    title: "Bassdrive"
+                }
+            ],
         },
         twitterFeed: {
             profile: "https://twitter.com/thecoffeepanda",
@@ -40,7 +52,7 @@ const app = new Vue({
         let audioEl = this.$refs[this.stream.el];
 
         audioEl.addEventListener("play", () => {
-           this.stream.play = true;
+            this.stream.play = true;
         });
         audioEl.addEventListener("pause", () => {
             this.stream.play = false;
@@ -51,12 +63,32 @@ const app = new Vue({
         //Attach error handler to audio stream element
         audioEl.addEventListener("error", this.streamError);
     },
+    beforeMount: function () {
+        //Set default station to first in station list.
+        //This has to be done after data init but before dom-bind.
+        this.stream.currentStation = this.stream.stations[0];
+    },
     methods: {
         /**
          * Toggles visibility of left side navigation
          */
-        toggleNav: function() {
+        toggleNav: function () {
             this.$refs.nav.toggle();
+        },
+        switchStation: function (id) {
+            if (id === this.stream.currentStation.id) return;
+            for (let i = 0; i < this.stream.stations.length; i++) {
+                if (this.stream.stations[i].id === id) {
+                    this.stream.currentStation = this.stream.stations[i];
+                    // Wait for vue to update src url in audio element before triggering play()
+                    Vue.nextTick(() => {
+                        this.stream.offline = false;
+                        this.stream.play = true;
+                    });
+                    return;
+                }
+            }
+            log.error("Attempted to switch to station with invalid station id", id);
         },
         /**
          * Trigger play or pause for audio el depending on state.
@@ -68,7 +100,7 @@ const app = new Vue({
             if (state) {
                 el.play();
                 log.debug("started stream");
-                this.notify("Now playing " + this.stream.title, 2000);
+                this.notify("Now playing " + this.stream.currentStation.title, 2000);
             }
             else {
                 el.pause();
