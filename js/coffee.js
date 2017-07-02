@@ -10,6 +10,7 @@ const app = new Vue({
         stream: {
             play: false,
             offline: false,
+            volume: 0.7,
             el: "streamEl",
             currentStation: undefined,
             stations: [
@@ -46,6 +47,9 @@ const app = new Vue({
             if (state) {
                 this.stream.play = false;
             }
+        },
+        "stream.volume": function () {
+            this.$refs[this.stream.el].volume = this.stream.volume;
         }
     },
     mounted: function () {
@@ -89,6 +93,24 @@ const app = new Vue({
                 }
             }
             log.error("Attempted to switch to station with invalid station id", id);
+        },
+        /**
+         * Modify stream volume by modifier value. Bounds of volume are 0 - 1
+         * @param value - Positive or negative number that will be added.
+         */
+        changeVolume: function (value) {
+            if (this.stream.volume + value > 1) {
+                this.stream.volume = 1;
+                log.debug("Hit upper bound for volume ctrl");
+            }
+            else if (this.stream.volume + value < 0) {
+                this.stream.volume = 0;
+                log.debug("Hit lower bound for volume ctrl");
+            }
+            else {
+                this.stream.volume = Math.round((this.stream.volume + value) * 10) / 10;
+                log.debug("Modified volume by " + value + " to " + this.stream.volume);
+            }
         },
         /**
          * Trigger play or pause for audio el depending on state.
