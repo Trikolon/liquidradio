@@ -26,7 +26,7 @@ const app = new Vue({
                     src: "http://equinox.shoutca.st:8702/;stream/1",
                     title: "Bassdrive"
                 }
-            ],
+            ]
         },
         twitterFeed: {
             profile: "https://twitter.com/thecoffeepanda",
@@ -40,20 +40,20 @@ const app = new Vue({
         }
     },
     watch: {
-        "stream.play": function (state) {
+        "stream.play" (state) {
             this.updatePlayState(state);
         },
-        "stream.offline": function (state) {
+        "stream.offline" (state) {
             if (state) {
                 this.stream.play = false;
             }
         },
-        "stream.volume": function () {
+        "stream.volume" () {
             this.$refs[this.stream.el].volume = this.stream.volume;
         }
     },
-    mounted: function () {
-        let audioEl = this.$refs[this.stream.el];
+    mounted() {
+        const audioEl = this.$refs[this.stream.el];
 
         audioEl.addEventListener("play", () => {
             this.stream.play = true;
@@ -67,7 +67,7 @@ const app = new Vue({
         //Attach error handler to audio stream element
         audioEl.addEventListener("error", this.streamError);
     },
-    beforeMount: function () {
+    beforeMount() {
         //Set default station to first in station list.
         //This has to be done after data init but before dom-bind.
         this.stream.currentStation = this.stream.stations[0];
@@ -76,7 +76,7 @@ const app = new Vue({
         /**
          * Toggles visibility of left side navigation
          */
-        toggleNav: function () {
+        toggleNav() {
             this.$refs.nav.toggle();
         },
         /**
@@ -84,7 +84,7 @@ const app = new Vue({
          * No action if station id is invalid
          * @param id - Identifier of station to switch to.
          */
-        switchStation: function (id) {
+        switchStation(id) {
             if (id === this.stream.currentStation.id) return;
             for (let i = 0; i < this.stream.stations.length; i++) {
                 if (this.stream.stations[i].id === id) {
@@ -103,7 +103,7 @@ const app = new Vue({
          * Modify stream volume by modifier value. Bounds of volume are 0 - 1
          * @param value - Positive or negative number that will be added.
          */
-        changeVolume: function (value) {
+        changeVolume(value) {
             if (this.stream.volume + value > 1) {
                 this.stream.volume = 1;
                 log.debug("Hit upper bound for volume ctrl");
@@ -114,20 +114,20 @@ const app = new Vue({
             }
             else {
                 this.stream.volume = Math.round((this.stream.volume + value) * 10) / 10;
-                log.debug("Modified volume by " + value + " to " + this.stream.volume);
+                log.debug(`Modified volume by ${value} to ${this.stream.volume}`);
             }
         },
         /**
          * Trigger play or pause for audio el depending on state.
          * @param state - true if play, false if pause.
          */
-        updatePlayState: function (state) {
+        updatePlayState(state) {
             const el = this.$refs[this.stream.el];
             log.debug("play state changed to", state);
             if (state) {
                 el.play();
                 log.debug("started stream");
-                this.notify("Now playing " + this.stream.currentStation.title, 2000);
+                this.notify(`Now playing ${this.stream.currentStation.title}`, 2000);
             }
             else {
                 el.pause();
@@ -137,7 +137,7 @@ const app = new Vue({
         /**
          * Reloads audio element to catch up in stream.
          */
-        catchUp: function () {
+        catchUp() {
             const el = this.$refs[this.stream.el];
             el.load();
             if (this.stream.play) {
@@ -152,7 +152,7 @@ const app = new Vue({
          * Error handler audio stream.
          * @param e - Event fired including error information.
          */
-        streamError: function (e) {
+        streamError(e) {
             log.error("Error in stream", e);
             let msg = "Error: ";
             switch (e.target.error.code) {
@@ -180,7 +180,7 @@ const app = new Vue({
          * @param message - Text for notification.
          * @param duration - Duration of visibility.
          */
-        notify: function (message, duration) {
+        notify(message, duration) {
             const el = this.$refs[this.notification.el];
             if (duration) {
                 this.notification.duration = duration;
