@@ -58,7 +58,6 @@
                     </md-list>
                 </md-list-expand>
             </md-list-item>
-            <md-divider class="md-inset"></md-divider>
             <md-list-item @click="toggleNav" :href="repoLink" class="md-primary">
                 <md-icon>code</md-icon>
                 <span>Source</span>
@@ -70,6 +69,14 @@
         <twitter-feed height="500" :profile="twitterFeed.profile" :theme="twitterFeed.theme"></twitter-feed>
     </div>
     <div id="streamCtrl">
+        <md-button class="md-icon-button md-raised md-dense" v-on:click="changeVolume(0.1)"
+                   :disabled="stream.volume === 1">
+            <md-icon>add</md-icon>
+        </md-button>
+        <md-button class="md-icon-button md-raised md-dense" v-on:click="changeVolume(-0.1)"
+                   :disabled="stream.volume === 0">
+            <md-icon>remove</md-icon>
+        </md-button>
         <md-button class="md-fab md-primary" :disabled="stream.offline" v-on:click="stream.play=!stream.play">
             <md-icon>{{stream.play ? "pause" : "play_arrow"}}</md-icon>
         </md-button>
@@ -77,9 +84,10 @@
             <md-icon>fast_forward</md-icon>
         </md-button>
     </div>
-    <audio ref="streamEl" v-bind:src="stream.currentStation.src" v-bind:type="stream.currentStation.type">
+    <audio ref="streamEl" :src="stream.currentStation.src" :type="stream.currentStation.type">
         {{notSupportedMessage}}
     </audio>
+    <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"></md-progress>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration"><span>{{notification.message}}</span>
     </md-snackbar>
 </div>
