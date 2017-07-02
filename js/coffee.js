@@ -79,6 +79,11 @@ const app = new Vue({
         toggleNav: function () {
             this.$refs.nav.toggle();
         },
+        /**
+         * Switches to a different station in stream object and changes play state to true.
+         * No action if station id is invalid
+         * @param id - Identifier of station to switch to.
+         */
         switchStation: function (id) {
             if (id === this.stream.currentStation.id) return;
             for (let i = 0; i < this.stream.stations.length; i++) {
@@ -143,6 +148,10 @@ const app = new Vue({
             }
             this.stream.offline = false;
         },
+        /**
+         * Error handler audio stream.
+         * @param e - Event fired including error information.
+         */
         streamError: function (e) {
             log.error("Error in stream", e);
             let msg = "Error: ";
