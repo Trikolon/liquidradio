@@ -10,7 +10,7 @@ const app = new Vue({
         stream: {
             play: false,
             offline: false,
-            volume: 0.7,
+            volume: 0.6,
             el: "streamEl",
             currentStation: undefined,
             stations: [
