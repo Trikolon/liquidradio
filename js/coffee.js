@@ -16,8 +16,8 @@ const app = new Vue({
             stations: [
                 {
                     id: "liquid_radio",
-                    type: "audio/mpeg",
-                    src: "http://s45.myradiostream.com:12036/listen.mp3",
+                    type: "audio/mp3",
+                    src: "http://proxima.shoutca.st:8368/;",
                     title: "Liquid Radio"
                 },
                 {
@@ -166,7 +166,7 @@ const app = new Vue({
                     msg += "Decoding error.";
                     break;
                 case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                    msg += "Stream offline.";
+                    msg = "Stream offline.";
                     break;
                 default:
                     msg += "Unknown error";
