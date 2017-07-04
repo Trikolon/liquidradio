@@ -2,7 +2,7 @@ Vue.use(VueMaterial);
 const app = new Vue({
     el: "#app",
     data: {
-        loglevel: "INFO",
+        loglevel: "DEBUG",
         title: "Liquid Radio",
         notSupportedMessage: "Your browser does not support audio streams, please update.",
         repoLink: "https://github.com/Trikolon/cfp-radio",
@@ -14,7 +14,6 @@ const app = new Vue({
             volume: 0.6,
             el: "streamEl",
             currentStation: undefined,
-            currentStationSource: 0,
             stations
         },
         twitterFeed: {
@@ -26,12 +25,6 @@ const app = new Vue({
             duration: 4000,
             position: "bottom center",
             el: "notification-bar"
-        }
-    },
-    computed: {
-        currentSource() {
-            log.debug("computed call");
-            return this.stream.currentStation.source[this.stream.currentStationSource];
         }
     },
     watch: {
@@ -55,6 +48,8 @@ const app = new Vue({
     mounted() {
         const audioEl = this.$refs[this.stream.el];
 
+
+        // Watch external changes
         audioEl.addEventListener("play", () => {
             this.stream.play = true;
             this.stream.loading = true;
@@ -62,13 +57,22 @@ const app = new Vue({
         audioEl.addEventListener("pause", () => {
             this.stream.play = false;
         });
+        audioEl.addEventListener("volumechange", () => {
+            this.stream.volume = this.$refs[this.stream.el].volume;
+        });
         audioEl.addEventListener("stalled", () => {
             this.notify("Stream stalled, check your connection.");
         });
 
+        // Audio stream has sufficiently buffered and starts playing
         audioEl.addEventListener("playing", () => {
             this.stream.loading = false;
             this.notify(`Now playing ${this.stream.currentStation.title}`, 2000);
+        });
+
+
+        Array.from(audioEl.getElementsByTagName("source")).forEach((source) => {
+            source.addEventListener("error", this.streamError);
         });
         //Attach error handler to audio stream element
         audioEl.addEventListener("error", this.streamError);
@@ -99,10 +103,11 @@ const app = new Vue({
                     this.stream.play = false;
                     // Wait for vue to update src url in audio element before triggering play()
                     Vue.nextTick(() => {
-                        this.stream.offline = false;
-                        this.stream.play = true;
+                        this.catchUp();
+                        // this.stream.offline = false;
+                        // this.stream.play = true;
                     });
-                    log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation, this.currentSource);
+                    log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation);
                     return;
                 }
             }
@@ -133,7 +138,6 @@ const app = new Vue({
         updatePlayState(state) {
             const el = this.$refs[this.stream.el];
             log.debug("play state changed to", state);
-            log.debug("source", this.currentSource.src);
             if (state) {
                 el.play();
                 log.debug("started stream");
@@ -164,7 +168,17 @@ const app = new Vue({
         streamError(e) {
             log.error("Error in stream", e);
             let msg = "Error: ";
-            switch (e.target.error.code) {
+            let error;
+
+
+            if(e.target.nodeName === "SOURCE") {
+                //error = this.$refs[this.stream.el].networkState;
+            }
+            else if (e.target.nodeName === "AUDIO") {
+
+            }
+
+            switch (error) {
                 case e.target.error.MEDIA_ERR_ABORTED:
                     msg += "Playback aborted by user.";
                     break;
@@ -175,32 +189,15 @@ const app = new Vue({
                     msg += "Decoding error.";
                     break;
                 case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                case e.target.error.NETWORK_NO_SOURCE: //FIXME only source el?
                     msg = "Stream offline.";
                     break;
                 default:
                     msg += "Unknown error";
                     break;
             }
-            // Only notify user and mark as offline if we can't recover
-            if (!this.tryNextStreamSource()) {
-                this.stream.offline = true;
-                this.notify(msg);
-            }
-        },
-        tryNextStreamSource() {
-            log.debug("Checking for alternative stream source");
-            if (this.stream.currentStationSource < this.stream.currentStation.source.length - 1) {
-                log.debug("Found alternative stream source, applying...");
-                this.stream.currentStationSource++;
-                Vue.nextTick(() => {
-                    this.catchUp();
-                });
-                return true;
-            }
-            else {
-                log.debug("No more alternative stream sources");
-                return false;
-            }
+            this.stream.offline = true;
+            this.notify(msg);
         },
         /**
          * Shows notification
