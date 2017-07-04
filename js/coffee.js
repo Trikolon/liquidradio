@@ -76,6 +76,7 @@ const app = new Vue({
             for (let i = 0; i < this.stream.stations.length; i++) {
                 if (this.stream.stations[i].id === id) {
                     this.stream.currentStation = this.stream.stations[i];
+                    this.stream.play = false;
                     // Wait for vue to update src url in audio element before triggering play()
                     Vue.nextTick(() => {
                         this.stream.offline = false;
