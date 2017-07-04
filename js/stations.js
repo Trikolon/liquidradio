@@ -5,7 +5,7 @@ const stations = [
         source: [
             {
                 type: "audio/mp3",
-                src: "http://proxima.shoutca.st:8359/stream"
+                src: "ahttp://proxima.shoutca.st:8359/stream"
             }
         ]
     },
@@ -15,7 +15,7 @@ const stations = [
         source: [
             {
                 type: "audio/mpeg",
-                src: "http://equinox.shoutca.st:8702/;stream/1"
+                src: "ahttp://equinox.shoutca.st:8702/;stream/1"
             },
             {
                 type: "audio/mpeg",

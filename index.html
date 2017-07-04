@@ -17,7 +17,7 @@
     <script src="lib/loglevel/loglevel.min.js"></script>
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
-    <script src="lib/vue/vue.min.js"></script>
+    <script src="lib/vue/vue.js"></script>
     <link rel="stylesheet" href="lib/vue-material/vue-material.css">
     <script src="lib/vue-material/vue-material.js"></script>
 
@@ -86,7 +86,8 @@
             <md-icon>fast_forward</md-icon>
         </md-button>
     </div>
-    <audio ref="streamEl" :src="currentSource.src" :type="currentSource.type" preload="metadata">
+    <audio ref="streamEl" preload="metadata">
+        <source v-for="source in stream.currentStation.source" :key="source.src"  :src="source.src" :type="source.type">
         {{notSupportedMessage}}
     </audio>
     <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"
