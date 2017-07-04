@@ -4,7 +4,7 @@ const stations = [
         title: "Liquid Radio",
         source: [
             {
-                type: "audio/mp3",
+                type: "audio/aac",
                 src: "http://proxima.shoutca.st:8359/stream"
             }
         ]
