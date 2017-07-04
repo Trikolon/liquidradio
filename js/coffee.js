@@ -2,7 +2,7 @@ Vue.use(VueMaterial);
 const app = new Vue({
     el: "#app",
     data: {
-        loglevel: "DEBUG",
+        loglevel: "INFO",
         title: "Liquid Radio",
         notSupportedMessage: "Your browser does not support audio streams, please update.",
         repoLink: "https://github.com/Trikolon/cfp-radio",
