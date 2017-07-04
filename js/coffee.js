@@ -13,6 +13,7 @@ const app = new Vue({
             volume: 0.6,
             el: "streamEl",
             currentStation: undefined,
+            currentStationSource: 0,
             stations
         },
         twitterFeed: {
@@ -26,18 +27,26 @@ const app = new Vue({
             el: "notification-bar"
         }
     },
+    computed: {
+        currentSource() {
+            log.debug("computed call");
+            return this.stream.currentStation.source[this.stream.currentStationSource];
+        }
+    },
     watch: {
         "stream.play" (state) {
             this.updatePlayState(state);
         },
         "stream.offline" (state) {
-            if (state) {
+            if(state) {
+                log.debug("Stream went offline");
                 this.stream.play = false;
             }
         },
         "stream.volume" () {
             this.$refs[this.stream.el].volume = this.stream.volume;
         }
+
     },
     mounted() {
         const audioEl = this.$refs[this.stream.el];
@@ -76,12 +85,14 @@ const app = new Vue({
             for (let i = 0; i < this.stream.stations.length; i++) {
                 if (this.stream.stations[i].id === id) {
                     this.stream.currentStation = this.stream.stations[i];
+                    this.stream.currentStationSource = 0;
                     this.stream.play = false;
                     // Wait for vue to update src url in audio element before triggering play()
                     Vue.nextTick(() => {
                         this.stream.offline = false;
                         this.stream.play = true;
                     });
+                    log.debug("Switched station to", this.stream.currentStation, this.currentSource);
                     return;
                 }
             }
@@ -112,6 +123,7 @@ const app = new Vue({
         updatePlayState(state) {
             const el = this.$refs[this.stream.el];
             log.debug("play state changed to", state);
+            log.debug("source", this.currentSource.src);
             if (state) {
                 el.play();
                 log.debug("started stream");
@@ -160,8 +172,26 @@ const app = new Vue({
                     msg += "Unknown error";
                     break;
             }
-            this.stream.offline = true;
-            this.notify(msg);
+            // Only notify user and mark as offline if we can't recover
+            if(!this.tryNextStreamSource()) {
+                this.stream.offline = true;
+                this.notify(msg);
+            }
+        },
+        tryNextStreamSource() {
+            log.debug("Checking for alternative stream source");
+            if (this.stream.currentStationSource < this.stream.currentStation.source.length-1) {
+                log.debug("Found alternative stream source, applying...");
+                this.stream.currentStationSource++;
+                Vue.nextTick(() => {
+                    this.catchUp();
+                });
+                return true;
+            }
+            else {
+                log.debug("No more alternative stream sources");
+                return false;
+            }
         },
         /**
          * Shows notification

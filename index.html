@@ -85,7 +85,7 @@
             <md-icon>fast_forward</md-icon>
         </md-button>
     </div>
-    <audio ref="streamEl" :src="stream.currentStation.src" :type="stream.currentStation.type">
+    <audio ref="streamEl" :src="currentSource.src" :type="currentSource.type">
         {{notSupportedMessage}}
     </audio>
     <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"></md-progress>
