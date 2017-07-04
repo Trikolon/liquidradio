@@ -70,17 +70,17 @@ const app = new Vue({
             this.notify(`Now playing ${this.stream.currentStation.title}`, 2000);
         });
 
+        //Attach error handler to last source element
+        const sources = Array.from(audioEl.getElementsByTagName("source"));
+        sources[sources.length - 1].addEventListener("error", this.streamError);
 
-        Array.from(audioEl.getElementsByTagName("source")).forEach((source) => {
-            source.addEventListener("error", this.streamError);
-        });
         //Attach error handler to audio stream element
         audioEl.addEventListener("error", this.streamError);
     },
     beforeMount() {
         //Set default station to first in station list.
         //This has to be done after data init but before dom-bind.
-        this.stream.currentStation = this.stream.stations[0];
+        [this.stream.currentStation] = this.stream.stations;
     },
     methods: {
         /**
@@ -167,34 +167,38 @@ const app = new Vue({
          */
         streamError(e) {
             log.error("Error in stream", e);
-            let msg = "Error: ";
-            let error;
+            let msg = "Unknown Error";
 
+            // Error from source tag
+            if (e.target.nodeName === "SOURCE") {
+                const audioEl = this.$refs[this.stream.el];
+                log.debug("Error originates from SOURCE tag");
 
-            if(e.target.nodeName === "SOURCE") {
-                //error = this.$refs[this.stream.el].networkState;
+                //NETWORK_NO_SOURCE
+                if (audioEl.networkState === 3) {
+                    msg = "Stream offline"
+                }
             }
+            // Error from audio tag
             else if (e.target.nodeName === "AUDIO") {
+                log.debug("Error originates from AUDIO tag");
+                log.error(e.target.error.code, e.target.error.message);
+                msg = "Error: ";
 
-            }
-
-            switch (error) {
-                case e.target.error.MEDIA_ERR_ABORTED:
-                    msg += "Playback aborted by user.";
-                    break;
-                case e.target.error.MEDIA_ERR_NETWORK:
-                    msg += "Network error. Check your connection.";
-                    break;
-                case e.target.error.MEDIA_ERR_DECODE:
-                    msg += "Decoding error.";
-                    break;
-                case e.target.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                case e.target.error.NETWORK_NO_SOURCE: //FIXME only source el?
-                    msg = "Stream offline.";
-                    break;
-                default:
-                    msg += "Unknown error";
-                    break;
+                switch (e.target.error.code) {
+                    case e.target.error.MEDIA_ERR_ABORTED:
+                        msg += "Playback aborted by user.";
+                        break;
+                    case e.target.error.MEDIA_ERR_NETWORK:
+                        msg += "Network error. Check your connection.";
+                        break;
+                    case e.target.error.MEDIA_ERR_DECODE:
+                        msg += "Decoding error.";
+                        break;
+                    default:
+                        msg += `Unknown error code ${e.target.code}`;
+                        break;
+                }
             }
             this.stream.offline = true;
             this.notify(msg);
