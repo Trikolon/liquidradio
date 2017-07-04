@@ -10,6 +10,7 @@ const app = new Vue({
         stream: {
             play: false,
             offline: false,
+            loading: false,
             volume: 0.6,
             el: "streamEl",
             currentStation: undefined,
@@ -35,10 +36,13 @@ const app = new Vue({
     },
     watch: {
         "stream.play" (state) {
+            if (!state) {
+                this.stream.loading = false;
+            }
             this.updatePlayState(state);
         },
         "stream.offline" (state) {
-            if(state) {
+            if (state) {
                 log.debug("Stream went offline");
                 this.stream.play = false;
             }
@@ -53,12 +57,18 @@ const app = new Vue({
 
         audioEl.addEventListener("play", () => {
             this.stream.play = true;
+            this.stream.loading = true;
         });
         audioEl.addEventListener("pause", () => {
             this.stream.play = false;
         });
         audioEl.addEventListener("stalled", () => {
             this.notify("Stream stalled, check your connection.");
+        });
+
+        audioEl.addEventListener("playing", () => {
+            this.stream.loading = false;
+            this.notify(`Now playing ${this.stream.currentStation.title}`, 2000);
         });
         //Attach error handler to audio stream element
         audioEl.addEventListener("error", this.streamError);
@@ -92,7 +102,7 @@ const app = new Vue({
                         this.stream.offline = false;
                         this.stream.play = true;
                     });
-                    log.debug("Switched station to", this.stream.currentStation, this.currentSource);
+                    log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation, this.currentSource);
                     return;
                 }
             }
@@ -127,7 +137,6 @@ const app = new Vue({
             if (state) {
                 el.play();
                 log.debug("started stream");
-                this.notify(`Now playing ${this.stream.currentStation.title}`, 2000);
             }
             else {
                 el.pause();
@@ -173,14 +182,14 @@ const app = new Vue({
                     break;
             }
             // Only notify user and mark as offline if we can't recover
-            if(!this.tryNextStreamSource()) {
+            if (!this.tryNextStreamSource()) {
                 this.stream.offline = true;
                 this.notify(msg);
             }
         },
         tryNextStreamSource() {
             log.debug("Checking for alternative stream source");
-            if (this.stream.currentStationSource < this.stream.currentStation.source.length-1) {
+            if (this.stream.currentStationSource < this.stream.currentStation.source.length - 1) {
                 log.debug("Found alternative stream source, applying...");
                 this.stream.currentStationSource++;
                 Vue.nextTick(() => {

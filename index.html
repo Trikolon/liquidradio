@@ -52,7 +52,8 @@
                 <span>Stations</span>
                 <md-list-expand>
                     <md-list>
-                        <md-list-item class="md-inset" v-for="station in stream.stations" :key="station.id" id="station.id"
+                        <md-list-item class="md-inset" v-for="station in stream.stations" :key="station.id"
+                                      id="station.id"
                                       v-on:click="switchStation(station.id); toggleNav()">
                             <span>{{station.title}}</span>
                         </md-list-item>
@@ -88,7 +89,8 @@
     <audio ref="streamEl" :src="currentSource.src" :type="currentSource.type">
         {{notSupportedMessage}}
     </audio>
-    <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"></md-progress>
+    <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"
+                 :md-indeterminate="stream.loading"></md-progress>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration"><span>{{notification.message}}</span>
     </md-snackbar>
 </div>
