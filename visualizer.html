@@ -6,27 +6,27 @@
 </audio>
 <canvas id="myCanvas" width="1024" height="1024" style="border:1px solid #000000;"></canvas>
 <script>
-    var audio = document.getElementById("streamEl");
-    var ctx = new window.AudioContext();
-    audio = ctx.createMediaElementSource(audio); // FIXME don't reuse variable
-    var analyser = ctx.createAnalyser();
+    let audio = document.getElementById("streamEl");
+    let ctx = new window.AudioContext();
+    audio = ctx.createMediaElementSource(audio); // FIXME don't reuse letiable
+    let analyser = ctx.createAnalyser();
     console.log("fftSize:", analyser.fftSize);
-    var divider = 16; // data "resolution" divider
-    var dividerHalf = divider / 2;
+    let divider = 16; // data "resolution" divider
+    let dividerHalf = divider / 2;
     analyser.fftSize = analyser.fftSize / divider;
     analyser.smoothingTimeConstant = 0.98;
     audio.connect(analyser);
     audio.connect(ctx.destination);
-    var canvas = document.getElementById("myCanvas");
-    var c = canvas.getContext("2d");
+    let canvas = document.getElementById("myCanvas");
+    let c = canvas.getContext("2d");
 
-    var bufferLength = analyser.frequencyBinCount;
-    var dataArray = new Uint8Array(bufferLength);
+    let bufferLength = analyser.frequencyBinCount;
+    let dataArray = new Uint8Array(bufferLength);
     console.log("divider:", divider);
     console.log("dataArray length:", dataArray.length);
 
 
-    var draw = () => {
+    let draw = () => {
 
         // get data for bars
         analyser.getByteFrequencyData(dataArray);
@@ -38,7 +38,7 @@
 //        c.fillRect(0, 0, canvas.width, canvas.height);
 //        c.globalAlpha = 1.0;
 //        c.fillStyle = "#000000";
-//        var data = c.getImageData(0, 0, canvas.width, canvas.height);
+//        let data = c.getImageData(0, 0, canvas.width, canvas.height);
 //        for (i = 0; i < data.length; i += 4) {
 //            data[i] = data[i] != 0 ? data[i] : 200;  /// add R
 //            data[i + 1] = data[i + 1] + 11;  /// add G
@@ -51,7 +51,7 @@
         c.beginPath();
 
         // loop through data, draw bars
-        for (var i = 0; i < dataArray.length; i++) {
+        for (let i = 0; i < dataArray.length; i++) {
             c.beginPath();
             c.lineWidth = divider - 2; // -2 to have small gap
             // offset by half because linewith goes both directions
