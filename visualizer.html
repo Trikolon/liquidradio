@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head></head>
+<body>
+<audio controls id="streamEl" src="lib/Technimatic Spring Mix.mp3" type="audio/mpeg" autoplay>
+</audio>
+<canvas id="myCanvas" width="1024" height="1024" style="border:1px solid #000000;"></canvas>
+<script>
+    var audio = document.getElementById("streamEl");
+    var ctx = new window.AudioContext();
+    audio = ctx.createMediaElementSource(audio); // FIXME don't reuse variable
+    var analyser = ctx.createAnalyser();
+    console.log("fftSize:", analyser.fftSize);
+    var divider = 16; // data "resolution" divider
+    var dividerHalf = divider / 2;
+    analyser.fftSize = analyser.fftSize / divider;
+    analyser.smoothingTimeConstant = 0.98;
+    audio.connect(analyser);
+    audio.connect(ctx.destination);
+    var canvas = document.getElementById("myCanvas");
+    var c = canvas.getContext("2d");
+
+    var bufferLength = analyser.frequencyBinCount;
+    var dataArray = new Uint8Array(bufferLength);
+    console.log("divider:", divider);
+    console.log("dataArray length:", dataArray.length);
+
+
+    var draw = () => {
+
+        // get data for bars
+        analyser.getByteFrequencyData(dataArray);
+//        analyser.getByteTimeDomainData(dataArray); // this is waveform, not bars
+
+        // trippy fade effect
+//        c.globalAlpha = 0.05;
+//        c.fillStyle = "#FFFFFF";
+//        c.fillRect(0, 0, canvas.width, canvas.height);
+//        c.globalAlpha = 1.0;
+//        c.fillStyle = "#000000";
+//        var data = c.getImageData(0, 0, canvas.width, canvas.height);
+//        for (i = 0; i < data.length; i += 4) {
+//            data[i] = data[i] != 0 ? data[i] : 200;  /// add R
+//            data[i + 1] = data[i + 1] + 11;  /// add G
+//            data[i + 2] = data[i + 2] + 100;  /// add B
+//        }
+//        c.putImageData(data, 0, 0);
+
+        // clear before redraw
+        c.clearRect(0, 0, canvas.width, canvas.height);
+        c.beginPath();
+
+        // loop through data, draw bars
+        for (var i = 0; i < dataArray.length; i++) {
+            c.beginPath();
+            c.lineWidth = divider - 2; // -2 to have small gap
+            // offset by half because linewith goes both directions
+            c.moveTo(dividerHalf + i * divider, canvas.height);
+            c.lineTo(dividerHalf + i * divider, (canvas.height - Math.pow(dataArray[i] / 255, 3) * canvas.height));
+            c.stroke();
+        }
+
+        requestAnimationFrame(draw);
+    };
+    requestAnimationFrame(draw);
+</script>
+</body>
+</html>
