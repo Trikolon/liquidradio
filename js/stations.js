@@ -4,8 +4,16 @@ const stations = [
         title: "Liquid Radio",
         source: [
             {
-                type: "audio/mp3",
+                type: "audio/aac",
+                src: "https://stream.liquidradio.pro/liquid"
+            },
+            {
+                type: "audio/aac",
                 src: "http://proxima.shoutca.st:8359/stream"
+            },
+            {
+                type: "audio/mp3",
+                src: "http://s45.myradiostream.com:12036/listen.mp3"
             }
         ]
     },
@@ -13,6 +21,10 @@ const stations = [
         id: "bassdrive",
         title: "Bassdrive",
         source: [
+            {
+                type: "audio/mpeg",
+                src: "https://stream.liquidradio.pro/bassdrive"
+            },
             {
                 type: "audio/mpeg",
                 src: "http://equinox.shoutca.st:8702/;stream/1"
