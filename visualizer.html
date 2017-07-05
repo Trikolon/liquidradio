@@ -2,67 +2,147 @@
 <html lang="en">
 <head></head>
 <body>
-<audio controls id="streamEl" src="lib/Technimatic Spring Mix.mp3" type="audio/mpeg" autoplay>
-</audio>
-<canvas id="myCanvas" width="1024" height="1024" style="border:1px solid #000000;"></canvas>
+<audio controls id="streamEl" src="lib/music.aac" autoplay style="width: 100%;" loop></audio>
+<!--<audio controls id="streamEl" src="lib/testtone.wav" autoplay style="width: 100%;" loop></audio>-->
+<canvas id="myCanvas" style="border:1px solid #888888; width: 100%; height: 100%;"></canvas>
 <script>
+    const divider = 4; // data "resolution" divider
+
+    // get audio element & build audio analyser
     let audio = document.getElementById("streamEl");
-    let ctx = new window.AudioContext();
-    audio = ctx.createMediaElementSource(audio); // FIXME don't reuse letiable
-    let analyser = ctx.createAnalyser();
-    console.log("fftSize:", analyser.fftSize);
-    let divider = 16; // data "resolution" divider
-    let dividerHalf = divider / 2;
+    const ctx = new window.AudioContext();
+    audio = ctx.createMediaElementSource(audio); // FIXME don't reuse variable
+
+    const analyser = ctx.createAnalyser();
     analyser.fftSize = analyser.fftSize / divider;
-    analyser.smoothingTimeConstant = 0.98;
+    analyser.maxDecibels = -20;
+    analyser.smoothingTimeConstant = 0.9;
+
+    // connections to analyser and sound output
     audio.connect(analyser);
-    audio.connect(ctx.destination);
-    let canvas = document.getElementById("myCanvas");
-    let c = canvas.getContext("2d");
+    audio.connect(ctx.destination); // disable when testing
 
-    let bufferLength = analyser.frequencyBinCount;
-    let dataArray = new Uint8Array(bufferLength);
-    console.log("divider:", divider);
-    console.log("dataArray length:", dataArray.length);
+    // setup data array
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    // setup canvas and canvas context variables
+    const canvas = document.getElementById("myCanvas");
+    const c = canvas.getContext("2d");
 
 
-    let draw = () => {
+    /**
+     * recalculate values needed by draw functions, supposed to be called on each resize event
+     */
+    const recalc = () => {
+        // for linear bars
+        barWidth = Math.ceil(canvas.width / dataArray.length);
+        offset = Math.floor(barWidth / 2);
 
+        // for circle bars
+        center = [canvas.width / 2, canvas.height / 2];
+        minDim = Math.min(center[0], center[1]);
+        cBarWith = (Math.min(center[0], center[1]) / dataArray.length);
+
+        grd = c.createRadialGradient(center[0], center[1], 0, center[0], center[1], Math.min(center[0], center[1]) - c.lineWidth / 2);
+        //        var grd=c.createLinearGradient(0,0,0,canvas.height); // alternative
+        grd.addColorStop(0, "white");
+        grd.addColorStop(1, "#3F51B5");
+
+        console.debug("fftSize:           ", analyser.fftSize);
+        console.debug("dataArray length:  ", dataArray.length);
+
+        console.debug("offset:            ", offset);
+        console.debug("cBarWith:          ", cBarWith);
+    };
+
+    /**
+     * checks on window resize if canvas dimensions have changed. If so, update canvas client dimensions.
+     * If step is skipped, canvas will be scaled and appears blurry.
+     */
+    const resize = () => {
+        console.log("resize event triggered");
+        // Lookup the size the browser is displaying the canvas.
+        const displayWidth = canvas.clientWidth;
+        const displayHeight = canvas.clientHeight;
+
+        // Check if the canvas is not the same size.
+        if (canvas.width != displayWidth ||
+            canvas.height != displayHeight) {
+
+            // Make the canvas the same size
+            canvas.width = displayWidth;
+            canvas.height = displayHeight;
+
+            recalc();
+        }
+    };
+
+    /**
+     * Draws vertical bars
+     */
+    const draw = () => {
         // get data for bars
         analyser.getByteFrequencyData(dataArray);
-//        analyser.getByteTimeDomainData(dataArray); // this is waveform, not bars
-
-        // trippy fade effect
-//        c.globalAlpha = 0.05;
-//        c.fillStyle = "#FFFFFF";
-//        c.fillRect(0, 0, canvas.width, canvas.height);
-//        c.globalAlpha = 1.0;
-//        c.fillStyle = "#000000";
-//        let data = c.getImageData(0, 0, canvas.width, canvas.height);
-//        for (i = 0; i < data.length; i += 4) {
-//            data[i] = data[i] != 0 ? data[i] : 200;  /// add R
-//            data[i + 1] = data[i + 1] + 11;  /// add G
-//            data[i + 2] = data[i + 2] + 100;  /// add B
-//        }
-//        c.putImageData(data, 0, 0);
-
         // clear before redraw
         c.clearRect(0, 0, canvas.width, canvas.height);
         c.beginPath();
 
+
         // loop through data, draw bars
         for (let i = 0; i < dataArray.length; i++) {
             c.beginPath();
-            c.lineWidth = divider - 2; // -2 to have small gap
+            c.lineWidth = Math.max(barWidth - 1, 1); // -2 to have small gap
             // offset by half because linewith goes both directions
-            c.moveTo(dividerHalf + i * divider, canvas.height);
-            c.lineTo(dividerHalf + i * divider, (canvas.height - Math.pow(dataArray[i] / 255, 3) * canvas.height));
+            c.moveTo(offset + i * barWidth, canvas.height);
+            c.lineTo(offset + i * barWidth, (canvas.height - Math.pow(dataArray[i] / 255, 3) * canvas.height));
             c.stroke();
         }
 
         requestAnimationFrame(draw);
     };
-    requestAnimationFrame(draw);
+
+    /**
+     * Draws circular bars
+     */
+    const drawCircle = () => {
+        // get data for bars
+        analyser.getByteFrequencyData(dataArray);
+
+        c.clearRect(0, 0, canvas.width, canvas.height);
+
+//        c.strokeStyle = grd; // EXPENSIVE
+        c.strokeStyle = "#3F51B5"; // material design primary
+        c.lineWidth = Math.floor(cBarWith) + 2; // at least 2 extra pixels to prevent shimmering
+
+        for (let i = 0; i < dataArray.length; i++) {
+
+            let powered = Math.pow(dataArray[i] / 255, 2);
+//            let powered = dataArray[i] / 255; // To power, or not to power, that is the question
+
+            // radius = minDim but take away half of linewidth, then decrease each step while going through array
+            let radius = Math.max(minDim - c.lineWidth / 2 - (minDim / dataArray.length) * i, 0);
+
+            // draw first half
+            c.beginPath();
+            c.arc(center[0], center[1], radius, 0.5 * Math.PI, 0.5 * Math.PI + Math.PI * powered, false);
+            c.stroke();
+
+            // draw second half
+            c.beginPath();
+            c.arc(center[0], center[1], radius, 0.5 * Math.PI, 0.5 * Math.PI - Math.PI * powered, true);
+            c.stroke();
+        }
+        requestAnimationFrame(drawCircle);
+    };
+
+    // start animation
+    //    requestAnimationFrame(draw);
+    requestAnimationFrame(drawCircle);
+
+    // setup resize event
+    resize();
+    window.addEventListener("resize", resize);
 </script>
 </body>
 </html>
