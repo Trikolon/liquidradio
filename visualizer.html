@@ -2,11 +2,12 @@
 <html lang="en">
 <head></head>
 <body>
+<!--<audio controls id="streamEl" src="lib/mirgefallt.mp3" autoplay style="width: 100%;" loop></audio>-->
 <audio controls id="streamEl" src="lib/music.aac" autoplay style="width: 100%;" loop></audio>
 <!--<audio controls id="streamEl" src="lib/testtone.wav" autoplay style="width: 100%;" loop></audio>-->
 <canvas id="myCanvas" style="border:1px solid #888888; width: 100%; height: 100%;"></canvas>
 <script>
-    const divider = 4; // data "resolution" divider
+    const divider = 8; // data "resolution" divider
 
     // get audio element & build audio analyser
     let audio = document.getElementById("streamEl");
@@ -35,22 +36,30 @@
      * recalculate values needed by draw functions, supposed to be called on each resize event
      */
     const recalc = () => {
+
+        // calculate an upper bound, we want to skip the highest frequencies in the last third of the array
+        upperbound = Math.round(dataArray.length * 2 / 3);
+
         // for linear bars
-        barWidth = Math.ceil(canvas.width / dataArray.length);
+        barWidth = Math.ceil(canvas.width / upperbound);
         offset = Math.floor(barWidth / 2);
 
         // for circle bars
         center = [canvas.width / 2, canvas.height / 2];
         minDim = Math.min(center[0], center[1]);
-        cBarWith = (Math.min(center[0], center[1]) / dataArray.length);
+        cBarWith = (Math.min(center[0], center[1]) / upperbound);
 
-        grd = c.createRadialGradient(center[0], center[1], 0, center[0], center[1], Math.min(center[0], center[1]) - c.lineWidth / 2);
-        //        var grd=c.createLinearGradient(0,0,0,canvas.height); // alternative
+//        grd = c.createRadialGradient(center[0], center[1], 0, center[0], center[1], Math.min(center[0], center[1]) - c.lineWidth / 2);
+        var grd = c.createLinearGradient(0, 0, 0, canvas.height); // alternative
         grd.addColorStop(0, "white");
         grd.addColorStop(1, "#3F51B5");
 
+        c.strokeStyle = grd; // EXPENSIVE
+//        c.strokeStyle = "#3F51B5"; // material design primary
+
         console.debug("fftSize:           ", analyser.fftSize);
         console.debug("dataArray length:  ", dataArray.length);
+        console.debug("upperbound:        ", upperbound);
 
         console.debug("offset:            ", offset);
         console.debug("cBarWith:          ", cBarWith);
@@ -102,6 +111,7 @@
         requestAnimationFrame(draw);
     };
 
+
     /**
      * Draws circular bars
      */
@@ -111,17 +121,26 @@
 
         c.clearRect(0, 0, canvas.width, canvas.height);
 
-//        c.strokeStyle = grd; // EXPENSIVE
-        c.strokeStyle = "#3F51B5"; // material design primary
+        // draw thin line from bottom to center, to hide render errors
+        c.beginPath();
+        c.moveTo(center[0], center[1]);
+        c.lineTo(center[0], canvas.height);
+        c.lineWidth = 1;
+        c.stroke();
+
+        // draw a thin outline of the circle
+        c.beginPath();
+        c.arc(center[0], center[1], minDim - 1, 0, 2 * Math.PI);
+        c.stroke();
         c.lineWidth = Math.floor(cBarWith) + 2; // at least 2 extra pixels to prevent shimmering
 
-        for (let i = 0; i < dataArray.length; i++) {
+        for (let i = 0; i < upperbound; i++) {
 
-            let powered = Math.pow(dataArray[i] / 255, 2);
-//            let powered = dataArray[i] / 255; // To power, or not to power, that is the question
+//            let powered = Math.pow(dataArray[i] / 255, 2);
+            let powered = dataArray[i] / 255; // To power, or not to power, that is the question
 
             // radius = minDim but take away half of linewidth, then decrease each step while going through array
-            let radius = Math.max(minDim - c.lineWidth / 2 - (minDim / dataArray.length) * i, 0);
+            let radius = Math.max(minDim - c.lineWidth / 2 - (minDim / upperbound) * i, 0);
 
             // draw first half
             c.beginPath();
