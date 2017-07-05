@@ -13,6 +13,7 @@ const app = new Vue({
             loading: false,
             volume: 0.6,
             el: "streamEl",
+            dom: undefined,
             currentStation: undefined,
             stations
         },
@@ -46,41 +47,41 @@ const app = new Vue({
 
     },
     mounted() {
-        const audioEl = this.$refs[this.stream.el];
+        this.stream.dom = this.$refs[this.stream.el];
 
 
         // Watch external changes
-        audioEl.addEventListener("play", () => {
+        this.stream.dom.addEventListener("play", () => {
             this.stream.play = true;
             this.stream.loading = true;
         });
-        audioEl.addEventListener("pause", () => {
+        this.stream.dom.addEventListener("pause", () => {
             this.stream.play = false;
         });
-        audioEl.addEventListener("volumechange", () => {
+        this.stream.dom.addEventListener("volumechange", () => {
             this.stream.volume = this.$refs[this.stream.el].volume;
         });
-        audioEl.addEventListener("stalled", () => {
+        this.stream.dom.addEventListener("stalled", () => {
             this.notify("Stream stalled, check your connection.");
         });
 
         // Audio stream has sufficiently buffered and starts playing
-        audioEl.addEventListener("playing", () => {
+        this.stream.dom.addEventListener("playing", () => {
             this.stream.loading = false;
             this.notify(`Now playing ${this.stream.currentStation.title}`, 2000);
         });
 
         //Attach error handler to last source element
-        const sources = Array.from(audioEl.getElementsByTagName("source"));
+        const sources = Array.from(this.stream.dom.getElementsByTagName("source"));
         sources[sources.length - 1].addEventListener("error", this.streamError);
 
         //Attach error handler to audio stream element
-        audioEl.addEventListener("error", this.streamError);
+        this.stream.dom.addEventListener("error", this.streamError);
     },
     beforeMount() {
         //Set default station to first in station list.
         //This has to be done after data init but before dom-bind.
-        [this.stream.currentStation] = this.stream.stations;
+        this.stream.currentStation = this.stream.stations[1];
     },
     methods: {
         /**
@@ -151,8 +152,7 @@ const app = new Vue({
          * Reloads audio element to catch up in stream.
          */
         catchUp() {
-            const el = this.$refs[this.stream.el];
-            el.load();
+            this.stream.dom.load();
             if (this.stream.play) {
                 this.updatePlayState(true);
             }
@@ -171,11 +171,10 @@ const app = new Vue({
 
             // Error from source tag
             if (e.target.nodeName === "SOURCE") {
-                const audioEl = this.$refs[this.stream.el];
                 log.debug("Error originates from SOURCE tag");
 
                 //NETWORK_NO_SOURCE
-                if (audioEl.networkState === 3) {
+                if (this.stream.dom.networkState === 3) {
                     msg = "Stream offline"
                 }
             }
