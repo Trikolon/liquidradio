@@ -1,5 +1,5 @@
 Vue.component("audio-visualizer", {
-    template: "<canvas width='512' height='512'></canvas>",
+    template: "<canvas></canvas>",
     props: {
         audioel: {},
         design: {

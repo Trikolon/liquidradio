@@ -69,7 +69,6 @@
     </md-sidenav>
     <div class="main-content">
         <h3>Now playing: {{stream.currentStation.title}}</h3>
-        <audio-visualizer design="square" :audioel="stream.dom"></audio-visualizer>
         <!--<twitter-feed height="500" :profile="twitterFeed.profile" :theme="twitterFeed.theme"></twitter-feed>-->
     </div>
     <div id="streamCtrl">
@@ -92,6 +91,7 @@
         <source v-for="source in stream.currentStation.source" :key="source.src"  :src="source.src" :type="source.type">
         {{notSupportedMessage}}
     </audio>
+    <audio-visualizer id="visualizer" design="square" :audioel="stream.dom"></audio-visualizer>
     <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"
                  :md-indeterminate="stream.loading"></md-progress>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration"><span>{{notification.message}}</span>
