@@ -1,6 +1,18 @@
 Vue.component("audio-visualizer", {
     template: "<canvas width='512' height='512'></canvas>",
-    props: ["audioel"],
+    props: {
+        audioel: {
+            validator(value) {
+                return value.hasOwnProperty("tagName") && value.tagName === "audio";
+            }
+        },
+        design: {
+            default: "square"
+        },
+        validator (value) {
+            return value === "square" || value === "circle";
+        }
+    },
     data (){
         return {
             divider: 16, // data "resolution" divider
@@ -45,7 +57,13 @@ Vue.component("audio-visualizer", {
             this.c = this.canvas.getContext("2d");
 
             this.resize();
-            requestAnimationFrame(this.drawCircle);
+
+            if(this.design === "square") {
+                requestAnimationFrame(this.draw);
+            }
+            else if(this.design === "circle") {
+                requestAnimationFrame(this.drawCircle);
+            }
         },
         /**
          * recalculate values needed by draw functions, supposed to be called on each resize event
