@@ -7,10 +7,10 @@ Vue.component("audio-visualizer", {
             }
         },
         design: {
-            default: "square"
-        },
-        validator (value) {
-            return value === "square" || value === "circle";
+            default: "square",
+            validator (value) {
+                return value === "square" || value === "circle";
+            }
         }
     },
     data (){
