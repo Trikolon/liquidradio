@@ -1,11 +1,7 @@
 Vue.component("audio-visualizer", {
     template: "<canvas width='512' height='512'></canvas>",
     props: {
-        audioel: {
-            validator(value) {
-                return value.hasOwnProperty("tagName") && value.tagName === "audio";
-            }
-        },
+        audioel: {},
         design: {
             default: "square",
             validator (value) {
