@@ -29,10 +29,14 @@ body {
     font-size: x-small;
 }
 
-#volumeBar {
+#volumeBar, #visualizer {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
+}
 
+#visualizer {
+    width: 100%;
+    z-index: -1;
 }
