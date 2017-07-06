@@ -5,9 +5,9 @@
 <!--<audio controls id="streamEl" src="lib/mirgefallt.mp3" autoplay style="width: 100%;" loop></audio>-->
 <audio controls id="streamEl" src="lib/music.aac" autoplay style="width: 100%;" loop></audio>
 <!--<audio controls id="streamEl" src="lib/testtone.wav" autoplay style="width: 100%;" loop></audio>-->
-<canvas id="myCanvas" style="border:1px solid #888888; width: 100%; height: 100%;"></canvas>
+<canvas id="myCanvas" style="border:1px solid #888888; width:90%; height:90%"></canvas>
 <script>
-    const divider = 8; // data "resolution" divider
+    const divider = 64; // data "resolution" divider
 
     // get audio element & build audio analyser
     let audio = document.getElementById("streamEl");
@@ -21,11 +21,12 @@
 
     // connections to analyser and sound output
     audio.connect(analyser);
-    audio.connect(ctx.destination); // disable when testing
+    //    audio.connect(ctx.destination); // disable when testing
 
     // setup data array
     const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    const freqBytes = new Uint8Array(bufferLength);
+    const waveBytes = new Uint8Array(bufferLength);
 
     // setup canvas and canvas context variables
     const canvas = document.getElementById("myCanvas");
@@ -38,7 +39,7 @@
     const recalc = () => {
 
         // calculate an upper bound, we want to skip the highest frequencies in the last third of the array
-        upperbound = Math.round(dataArray.length * 2 / 3);
+        upperbound = Math.round(freqBytes.length * 2 / 3);
 
         // for linear bars
         barWidth = Math.ceil(canvas.width / upperbound);
@@ -50,15 +51,15 @@
         cBarWith = (Math.min(center[0], center[1]) / upperbound);
 
 //        grd = c.createRadialGradient(center[0], center[1], 0, center[0], center[1], Math.min(center[0], center[1]) - c.lineWidth / 2);
-        var grd = c.createLinearGradient(0, 0, 0, canvas.height); // alternative
+        const grd = c.createLinearGradient(0, 0, 0, canvas.height); // alternative
         grd.addColorStop(0, "white");
-        grd.addColorStop(1, "#3F51B5");
+        grd.addColorStop(1, "#1A237E");
 
         c.strokeStyle = grd; // EXPENSIVE
 //        c.strokeStyle = "#3F51B5"; // material design primary
 
         console.debug("fftSize:           ", analyser.fftSize);
-        console.debug("dataArray length:  ", dataArray.length);
+        console.debug("freqBytes length:  ", freqBytes.length);
         console.debug("upperbound:        ", upperbound);
 
         console.debug("offset:            ", offset);
@@ -83,8 +84,8 @@
             canvas.width = displayWidth;
             canvas.height = displayHeight;
 
-            recalc();
         }
+        recalc();
     };
 
     /**
@@ -92,19 +93,19 @@
      */
     const draw = () => {
         // get data for bars
-        analyser.getByteFrequencyData(dataArray);
+        analyser.getByteFrequencyData(freqBytes);
         // clear before redraw
         c.clearRect(0, 0, canvas.width, canvas.height);
         c.beginPath();
 
 
         // loop through data, draw bars
-        for (let i = 0; i < dataArray.length; i++) {
+        for (let i = 0; i < freqBytes.length; i++) {
             c.beginPath();
             c.lineWidth = Math.max(barWidth - 1, 1); // -2 to have small gap
             // offset by half because linewith goes both directions
             c.moveTo(offset + i * barWidth, canvas.height);
-            c.lineTo(offset + i * barWidth, (canvas.height - Math.pow(dataArray[i] / 255, 3) * canvas.height));
+            c.lineTo(offset + i * barWidth, (canvas.height - Math.pow(freqBytes[i] / 255, 3) * canvas.height));
             c.stroke();
         }
 
@@ -117,7 +118,7 @@
      */
     const drawCircle = () => {
         // get data for bars
-        analyser.getByteFrequencyData(dataArray);
+        analyser.getByteFrequencyData(freqBytes);
 
         c.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -136,8 +137,8 @@
 
         for (let i = 0; i < upperbound; i++) {
 
-//            let powered = Math.pow(dataArray[i] / 255, 2);
-            let powered = dataArray[i] / 255; // To power, or not to power, that is the question
+            let powered = Math.pow(freqBytes[i] / 255, 2);
+//            let powered = freqBytes[i] / 255; // To power, or not to power, that is the question
 
             // radius = minDim but take away half of linewidth, then decrease each step while going through array
             let radius = Math.max(minDim - c.lineWidth / 2 - (minDim / upperbound) * i, 0);
@@ -155,13 +156,13 @@
         requestAnimationFrame(drawCircle);
     };
 
-    // start animation
-    //    requestAnimationFrame(draw);
-    requestAnimationFrame(drawCircle);
-
     // setup resize event
     resize();
     window.addEventListener("resize", resize);
+
+    // start animation
+//    requestAnimationFrame(draw);
+    requestAnimationFrame(drawCircle);
 </script>
 </body>
 </html>
