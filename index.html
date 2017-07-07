@@ -66,7 +66,20 @@
                 <span>Visualizer</span>
                 <md-switch v-model="visualizer" class="md-primary"></md-switch>
             </md-list-item>
-            <md-list-item @click="toggleNav" :href="repoLink" class="md-primary">
+            <!-- Social links -->
+            <md-list-item class="md-primary">
+                <md-icon>share</md-icon>
+                <span>Follow Us</span>
+                <md-list-expand>
+                    <md-list>
+                        <md-list-item class="md-inset" v-for="link in socialLinks" :key="name"
+                                      :href="link.url" target="_blank">
+                            <span>{{link.name}}</span>
+                        </md-list-item>
+                    </md-list>
+                </md-list-expand>
+            </md-list-item>
+            <md-list-item @click="toggleNav" :href="repoLink" class="md-primary" target="_blank">
                 <md-icon>code</md-icon>
                 <span>Source</span>
             </md-list-item>
@@ -92,10 +105,10 @@
         </md-button>
     </div>
     <audio ref="streamEl" preload="metadata" crossorigin="anonymous">
-        <source v-for="source in stream.currentStation.source" :key="source.src"  :src="source.src" :type="source.type">
-        {{notSupportedMessage}}
+        <source v-for="source in stream.currentStation.source" :key="source.src" :src="source.src" :type="source.type">
     </audio>
-    <audio-visualizer v-show="visualizer" id="visualizer" design="square" :audioel="stream.dom" barcolor="#E91E63"></audio-visualizer>
+    <audio-visualizer v-show="visualizer" id="visualizer" design="square" :audioel="stream.dom"
+                      barcolor="#E91E63"></audio-visualizer>
     <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"
                  :md-indeterminate="stream.loading"></md-progress>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration"><span>{{notification.message}}</span>

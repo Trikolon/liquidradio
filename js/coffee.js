@@ -4,7 +4,6 @@ const app = new Vue({
     data: {
         loglevel: "INFO",
         title: "Liquid Radio",
-        notSupportedMessage: "Your browser does not support audio streams, please update.",
         repoLink: "https://github.com/Trikolon/liquidradio",
         version: "0.5",
         stream: {
@@ -17,10 +16,6 @@ const app = new Vue({
             currentStation: undefined,
             stations
         },
-        twitterFeed: {
-            profile: "https://twitter.com/thecoffeepanda",
-            theme: "dark"
-        },
         notification: {
             message: "",
             duration: 4000,
@@ -28,7 +23,17 @@ const app = new Vue({
             el: "notification-bar"
         },
         visualizer: true,
-        storageSupported: typeof(Storage) !== "undefined"
+        storageSupported: typeof(Storage) !== "undefined",
+        socialLinks: [
+            {
+                name: "Facebook",
+                url: "https://facebook.com/liquidradio.pro"
+            },
+            {
+                name: "Instagram",
+                url: "https://instagram.com/liquidradio.pro"
+            }
+        ]
     },
     watch: {
         "stream.play" (state) {
@@ -48,7 +53,7 @@ const app = new Vue({
         },
         "visualizer" () {
             log.debug("visualizer watch, new value:", this.visualizer);
-            if(this.storageSupported) {
+            if (this.storageSupported) {
                 log.debug("Saving state to config");
                 localStorage.setItem("visualizer", this.visualizer);
             }
@@ -91,7 +96,7 @@ const app = new Vue({
         //This has to be done after data init but before dom-bind.
         [this.stream.currentStation] = this.stream.stations;
 
-        if(this.storageSupported) {
+        if (this.storageSupported) {
             let volume = localStorage.getItem("volume");
             if (volume) {
                 this.stream.volume = volume;
@@ -99,7 +104,7 @@ const app = new Vue({
 
             let visualizer = localStorage.getItem("visualizer");
             log.debug("visualizer state", visualizer);
-            if(visualizer !== null) {
+            if (visualizer !== null) {
                 this.visualizer = visualizer === "true";
             }
         }
@@ -153,7 +158,7 @@ const app = new Vue({
                 log.debug(`Modified volume by ${value} to ${this.stream.volume}`);
             }
             // Save volume setting to config
-            if(this.storageSupported) {
+            if (this.storageSupported) {
                 localStorage.setItem("volume", this.stream.volume);
             }
         },
