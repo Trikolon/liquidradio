@@ -36,7 +36,7 @@ Vue.component("audio-visualizer", {
             this.divider = 16; // data "resolution" divider
             // get audio element & build audio analyser
             this.ctx = new window.AudioContext();
-            this.audio = this.ctx.createMediaElementSource(this.audioel); // FIXME don't reuse variable
+            this.audio = this.ctx.createMediaElementSource(this.audioel);
 
             this.analyser = this.ctx.createAnalyser();
             this.analyser.fftSize = this.analyser.fftSize / this.divider;
@@ -124,6 +124,12 @@ Vue.component("audio-visualizer", {
          * Draws vertical bars
          */
         draw() {
+            // skip logic if audio is paused or canvas is hidden
+            if (this.audioel.paused || this.canvas.offsetHeight === 0) {
+                requestAnimationFrame(this.draw);
+                return;
+            }
+
             // get data for bars
             this.analyser.getByteFrequencyData(this.freqBytes);
             // clear before redraw
@@ -149,6 +155,12 @@ Vue.component("audio-visualizer", {
          * Draws circular bars
          */
         drawCircle() {
+            // skip logic if audio is paused or canvas is hidden
+            if (this.audioel.paused || this.canvas.offsetHeight === 0) {
+                requestAnimationFrame(this.draw);
+                return;
+            }
+
             // get data for bars
             this.analyser.getByteFrequencyData(this.freqBytes);
 
