@@ -24,11 +24,6 @@ body {
     overflow-x: hidden;
 }
 
-.bottom-list {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-}
 
 #versionInfo {
     font-size: x-small;
