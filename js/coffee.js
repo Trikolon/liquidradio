@@ -5,7 +5,7 @@ const app = new Vue({
         loglevel: "INFO",
         title: "Liquid Radio",
         notSupportedMessage: "Your browser does not support audio streams, please update.",
-        repoLink: "https://github.com/Trikolon/cfp-radio",
+        repoLink: "https://github.com/Trikolon/liquidradio",
         version: "0.5",
         stream: {
             play: false,
@@ -27,7 +27,8 @@ const app = new Vue({
             position: "bottom center",
             el: "notification-bar"
         },
-        visualizer: true
+        visualizer: true,
+        storageSupported: typeof(Storage) !== "undefined"
     },
     watch: {
         "stream.play" (state) {
@@ -45,7 +46,6 @@ const app = new Vue({
         "stream.volume" () {
             this.$refs[this.stream.el].volume = this.stream.volume;
         }
-
     },
     mounted() {
         this.stream.dom = this.$refs[this.stream.el];
@@ -82,7 +82,14 @@ const app = new Vue({
     beforeMount() {
         //Set default station to first in station list.
         //This has to be done after data init but before dom-bind.
-        this.stream.currentStation = this.stream.stations[1];
+        [this.stream.currentStation] = this.stream.stations;
+
+        if(this.storageSupported) {
+            let volume = localStorage.getItem("volume");
+            if (volume) {
+                this.stream.volume = volume;
+            }
+        }
     },
     methods: {
         /**
@@ -131,6 +138,10 @@ const app = new Vue({
             else {
                 this.stream.volume = Math.round((this.stream.volume + value) * 10) / 10;
                 log.debug(`Modified volume by ${value} to ${this.stream.volume}`);
+            }
+            // Save volume setting to config
+            if(this.storageSupported) {
+                localStorage.setItem("volume", this.stream.volume);
             }
         },
         /**
