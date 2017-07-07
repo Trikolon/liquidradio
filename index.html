@@ -61,6 +61,11 @@
                     </md-list>
                 </md-list-expand>
             </md-list-item>
+            <md-list-item class="md-primary">
+                <md-icon>graphic_eq</md-icon>
+                <span>Visualizer</span>
+                <md-switch v-model="visualizer" class="md-primary"></md-switch>
+            </md-list-item>
             <md-list-item @click="toggleNav" :href="repoLink" class="md-primary">
                 <md-icon>code</md-icon>
                 <span>Source</span>
@@ -91,7 +96,7 @@
         <source v-for="source in stream.currentStation.source" :key="source.src"  :src="source.src" :type="source.type">
         {{notSupportedMessage}}
     </audio>
-    <audio-visualizer id="visualizer" design="square" :audioel="stream.dom" barcolor="#E91E63"></audio-visualizer>
+    <audio-visualizer v-if="visualizer" id="visualizer" design="square" :audioel="stream.dom" barcolor="#E91E63"></audio-visualizer>
     <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"
                  :md-indeterminate="stream.loading"></md-progress>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration"><span>{{notification.message}}</span>

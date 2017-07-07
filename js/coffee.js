@@ -26,7 +26,8 @@ const app = new Vue({
             duration: 4000,
             position: "bottom center",
             el: "notification-bar"
-        }
+        },
+        visualizer: true
     },
     watch: {
         "stream.play" (state) {
