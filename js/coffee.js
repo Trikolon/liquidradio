@@ -45,6 +45,13 @@ const app = new Vue({
         },
         "stream.volume" () {
             this.$refs[this.stream.el].volume = this.stream.volume;
+        },
+        "visualizer" () {
+            log.debug("visualizer watch, new value:", this.visualizer);
+            if(this.storageSupported) {
+                log.debug("Saving state to config");
+                localStorage.setItem("visualizer", this.visualizer);
+            }
         }
     },
     mounted() {
@@ -88,6 +95,12 @@ const app = new Vue({
             let volume = localStorage.getItem("volume");
             if (volume) {
                 this.stream.volume = volume;
+            }
+
+            let visualizer = localStorage.getItem("visualizer");
+            log.debug("visualizer state", visualizer);
+            if(visualizer !== null) {
+                this.visualizer = visualizer === "true";
             }
         }
     },
