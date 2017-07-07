@@ -86,7 +86,6 @@ const app = new Vue({
         try {
             let volume = localStorage.getItem("volume");
             if (volume) {
-                volume = parseFloat(volume);
                 this.stream.volume = volume;
             }
         }
