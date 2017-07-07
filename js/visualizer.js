@@ -157,7 +157,7 @@ Vue.component("audio-visualizer", {
         drawCircle() {
             // skip logic if audio is paused or canvas is hidden
             if (this.audioel.paused || this.canvas.offsetHeight === 0) {
-                requestAnimationFrame(this.draw);
+                requestAnimationFrame(this.drawCircle);
                 return;
             }
 
