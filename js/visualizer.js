@@ -7,6 +7,10 @@ Vue.component("audio-visualizer", {
             validator (value) {
                 return value === "square" || value === "circle";
             }
+        },
+        barcolor: {
+            type: String,
+            default: "#3F51B5"
         }
     },
     data (){
@@ -84,7 +88,7 @@ Vue.component("audio-visualizer", {
             this.grd.addColorStop(1, "#1A237E");
 
             // this.c.strokeStyle = this.grd; // EXPENSIVE
-            this.c.strokeStyle = "#3F51B5"; // material design primary
+            this.c.strokeStyle = this.barcolor; // material design primary
 
             log.debug("fftSize:           ", this.analyser.fftSize);
             log.debug("freqBytes length:  ", this.freqBytes.length);
