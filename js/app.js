@@ -112,12 +112,6 @@ const app = new Vue({
     },
     methods: {
         /**
-         * Toggles visibility of left side navigation
-         */
-        toggleNav() {
-            this.$refs.nav.toggle();
-        },
-        /**
          * Switches to a different station in stream object and changes play state to true.
          * No action if station id is invalid
          * @param id - Identifier of station to switch to.
