@@ -5,7 +5,7 @@ const app = new Vue({
         loglevel: "INFO",
         title: "Liquid Radio",
         notSupportedMessage: "Your browser does not support audio streams, please update.",
-        repoLink: "https://github.com/Trikolon/cfp-radio",
+        repoLink: "https://github.com/Trikolon/liquidradio",
         version: "0.5",
         stream: {
             play: false,
