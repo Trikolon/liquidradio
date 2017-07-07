@@ -14,10 +14,6 @@ body {
     align-items: center;
 }
 
-.twitter-timeline {
-    max-width: 400px !important;
-}
-
 .main-content {
     padding: 20px;
     display: flex;
@@ -26,6 +22,12 @@ body {
     height: 90vh;
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.bottom-list {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 
 #versionInfo {

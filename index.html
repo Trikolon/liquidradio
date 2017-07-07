@@ -66,23 +66,25 @@
                 <span>Visualizer</span>
                 <md-switch v-model="visualizer" class="md-primary"></md-switch>
             </md-list-item>
-            <!-- Social links -->
-            <md-list-item class="md-primary">
-                <md-icon>share</md-icon>
-                <span>Follow Us</span>
-                <md-list-expand>
-                    <md-list>
-                        <md-list-item class="md-inset" v-for="link in socialLinks" :key="name"
-                                      :href="link.url" target="_blank">
-                            <span>{{link.name}}</span>
-                        </md-list-item>
-                    </md-list>
-                </md-list-expand>
-            </md-list-item>
-            <md-list-item @click="toggleNav" :href="repoLink" class="md-primary" target="_blank">
-                <md-icon>code</md-icon>
-                <span>Source</span>
-            </md-list-item>
+        </md-list>
+        <md-list class="bottom-list">
+                <!-- Social links -->
+                <md-list-item class="md-primary">
+                    <md-icon>share</md-icon>
+                    <span>Follow Us</span>
+                    <md-list-expand>
+                        <md-list>
+                            <md-list-item class="md-inset" v-for="link in socialLinks" :key="link.name"
+                                          :href="link.url" target="_blank">
+                                <span>{{link.name}}</span>
+                            </md-list-item>
+                        </md-list>
+                    </md-list-expand>
+                </md-list-item>
+                <md-list-item @click="toggleNav" :href="repoLink" class="md-primary" target="_blank">
+                    <md-icon>code</md-icon>
+                    <span>Source</span>
+                </md-list-item>
         </md-list>
     </md-sidenav>
     <div class="main-content">
