@@ -10,7 +10,7 @@ const app = new Vue({
             play: false,
             offline: false,
             loading: false,
-            volume: 0.6,
+            volume: parseFloat(localStorage ? localStorage.getItem("volume") || "0.6" : "0.6"),
             el: "streamEl",
             dom: undefined,
             currentStation: undefined,
@@ -22,8 +22,7 @@ const app = new Vue({
             position: "bottom center",
             el: "notification-bar"
         },
-        visualizer: true,
-        storageSupported: typeof(Storage) !== "undefined",
+        visualizer: JSON.parse(localStorage ? localStorage.getItem("visualizer") || "true" : "true"),
         socialLinks: [
             {
                 name: "Facebook",
@@ -53,10 +52,7 @@ const app = new Vue({
         },
         "visualizer" () {
             log.debug("visualizer watch, new value:", this.visualizer);
-            if (this.storageSupported) {
-                log.debug("Saving state to config");
-                localStorage.setItem("visualizer", this.visualizer);
-            }
+            localStorage ? localStorage.setItem("visualizer", this.visualizer) : null;
         }
     },
     mounted() {
@@ -96,19 +92,6 @@ const app = new Vue({
         //This has to be done after data init but before dom-bind.
         [this.stream.currentStation] = this.stream.stations;
 
-        if (this.storageSupported) {
-            let volume = localStorage.getItem("volume");
-            if (volume) {
-                volume = parseFloat(volume);
-                this.stream.volume = volume;
-            }
-
-            let visualizer = localStorage.getItem("visualizer");
-            log.debug("visualizer state", visualizer);
-            if (visualizer !== null) {
-                this.visualizer = visualizer === "true";
-            }
-        }
     },
     methods: {
         /**
@@ -153,9 +136,7 @@ const app = new Vue({
                 log.debug(`Modified volume by ${value} to ${this.stream.volume}`);
             }
             // Save volume setting to config
-            if (this.storageSupported) {
-                localStorage.setItem("volume", this.stream.volume);
-            }
+            localStorage ? localStorage.setItem("volume", this.stream.volume) : null;
         },
         /**
          * Trigger play or pause for audio el depending on state.
