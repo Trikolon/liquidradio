@@ -86,12 +86,12 @@ Vue.component("audio-visualizer", {
             // this.c.strokeStyle = this.grd; // EXPENSIVE
             this.c.strokeStyle = "#3F51B5"; // material design primary
 
-            console.debug("fftSize:           ", this.analyser.fftSize);
-            console.debug("freqBytes length:  ", this.freqBytes.length);
-            console.debug("upperbound:        ", this.upperbound);
+            log.debug("fftSize:           ", this.analyser.fftSize);
+            log.debug("freqBytes length:  ", this.freqBytes.length);
+            log.debug("upperbound:        ", this.upperbound);
 
-            console.debug("offset:            ", this.offset);
-            console.debug("cBarWith:          ", this.cBarWith);
+            log.debug("offset:            ", this.offset);
+            log.debug("cBarWith:          ", this.cBarWith);
         },
 
         /**
@@ -99,7 +99,7 @@ Vue.component("audio-visualizer", {
          * If step is skipped, canvas will be scaled and appears blurry.
          */
         resize() {
-            console.log("resize event triggered");
+            log.debug("resize event triggered");
             // Lookup the size the browser is displaying the canvas.
             const displayWidth = this.canvas.clientWidth;
             const displayHeight = this.canvas.clientHeight;
