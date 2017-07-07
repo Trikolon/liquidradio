@@ -81,6 +81,18 @@ const app = new Vue({
         //Set default station to first in station list.
         //This has to be done after data init but before dom-bind.
         [this.stream.currentStation] = this.stream.stations;
+
+        //Load config
+        try {
+            let volume = localStorage.getItem("volume");
+            if (volume) {
+                volume = parseFloat(volume);
+                this.stream.volume = volume;
+            }
+        }
+        catch (error) {
+            log.debug("Local storage is not supported by browser. Using default settings.", error);
+        }
     },
     methods: {
         /**
@@ -129,6 +141,13 @@ const app = new Vue({
             else {
                 this.stream.volume = Math.round((this.stream.volume + value) * 10) / 10;
                 log.debug(`Modified volume by ${value} to ${this.stream.volume}`);
+            }
+            // Save volume setting to config
+            try {
+                localStorage.setItem("volume", this.stream.volume);
+            }
+            catch (error) {
+                log.debug("Can't store volume setting because localstorage is not supported by browser", error);
             }
         },
         /**
