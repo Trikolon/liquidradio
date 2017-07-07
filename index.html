@@ -31,7 +31,7 @@
 <div id="app" class="phone-viewport" v-cloak>
     <md-whiteframe md-tag="md-toolbar" md-elevation="2" class="md-small">
         <md-toolbar>
-            <md-button class="md-icon-button" @click="toggleNav">
+            <md-button class="md-icon-button" v-on:click="$refs.nav.toggle()">
                 <md-icon>menu</md-icon>
             </md-button>
             <h1 class="md-title">{{title}}</h1>
@@ -55,7 +55,7 @@
                     <md-list>
                         <md-list-item class="md-inset" v-for="station in stream.stations" :key="station.id"
                                       id="station.id"
-                                      v-on:click="switchStation(station.id); toggleNav()">
+                                      v-on:click="switchStation(station.id); $refs.nav.toggle()">
                             <span>{{station.title}}</span>
                         </md-list-item>
                     </md-list>
@@ -75,13 +75,13 @@
                     <md-list-expand>
                         <md-list>
                             <md-list-item class="md-inset" v-for="link in socialLinks" :key="link.name"
-                                          :href="link.url" target="_blank">
+                                          :href="link.url" target="_blank" v-on:click="$refs.nav.toggle()">
                                 <span>{{link.name}}</span>
                             </md-list-item>
                         </md-list>
                     </md-list-expand>
                 </md-list-item>
-                <md-list-item @click="toggleNav" :href="repoLink" class="md-primary" target="_blank">
+                <md-list-item v-on:click="$refs.nav.toggle()" :href="repoLink" class="md-primary" target="_blank">
                     <md-icon>code</md-icon>
                     <span>Source</span>
                 </md-list-item>
