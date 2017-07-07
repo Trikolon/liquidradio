@@ -25,7 +25,8 @@ const app = new Vue({
             duration: 4000,
             position: "bottom center",
             el: "notification-bar"
-        }
+        },
+        storageSupported: typeof(Storage) !== "undefined"
     },
     watch: {
         "stream.play" (state) {
@@ -43,7 +44,6 @@ const app = new Vue({
         "stream.volume" () {
             this.$refs[this.stream.el].volume = this.stream.volume;
         }
-
     },
     mounted() {
         const audioEl = this.$refs[this.stream.el];
@@ -82,15 +82,11 @@ const app = new Vue({
         //This has to be done after data init but before dom-bind.
         [this.stream.currentStation] = this.stream.stations;
 
-        //Load config
-        try {
+        if(this.storageSupported) {
             let volume = localStorage.getItem("volume");
             if (volume) {
                 this.stream.volume = volume;
             }
-        }
-        catch (error) {
-            log.debug("Local storage is not supported by browser. Using default settings.", error);
         }
     },
     methods: {
@@ -142,11 +138,8 @@ const app = new Vue({
                 log.debug(`Modified volume by ${value} to ${this.stream.volume}`);
             }
             // Save volume setting to config
-            try {
+            if(this.storageSupported) {
                 localStorage.setItem("volume", this.stream.volume);
-            }
-            catch (error) {
-                log.debug("Can't store volume setting because localstorage is not supported by browser", error);
             }
         },
         /**
