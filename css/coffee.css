@@ -39,4 +39,5 @@ body {
 #visualizer {
     width: 100%;
     z-index: -1;
+    max-height: 25vh;
 }
