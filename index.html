@@ -28,7 +28,7 @@
     <script src="js/stations.js"></script>
 </head>
 <body>
-<div id="app" class="phone-viewport">
+<div id="app" class="phone-viewport" v-cloak>
     <md-whiteframe md-tag="md-toolbar" md-elevation="2" class="md-small">
         <md-toolbar>
             <md-button class="md-icon-button" @click="toggleNav">
@@ -74,7 +74,6 @@
     </md-sidenav>
     <div class="main-content">
         <h3>Now playing: {{stream.currentStation.title}}</h3>
-        <!--<twitter-feed height="500" :profile="twitterFeed.profile" :theme="twitterFeed.theme"></twitter-feed>-->
     </div>
     <div id="streamCtrl">
         <md-button class="md-icon-button md-raised md-dense" v-on:click="changeVolume(-0.1)"
@@ -103,6 +102,5 @@
     </md-snackbar>
 </div>
 <script src="js/coffee.js"></script>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>
 </html>

@@ -23,6 +23,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #versionInfo {
@@ -40,4 +43,8 @@ body {
     width: 100%;
     z-index: -1;
     opacity: 0.5;
+}
+
+[v-cloak]{
+    display: none;
 }
