@@ -5,7 +5,7 @@
 </p>
 <p align="center">Liquid Radio Frontend</p>
 <p align="center">
-    <a href="https://codeclimate.com/github/Trikolon/cfp-radio">
+    <a href="https://codeclimate.com/github/Trikolon/liquidradio">
         <img src="https://codeclimate.com/github/Trikolon/liquidradio/badges/gpa.svg"></img>
     </a>
     <a href="https://gitter.im/liquid-radio">
