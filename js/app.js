@@ -80,11 +80,9 @@ const app = new Vue({
             this.notify(`Now playing ${this.stream.currentStation.title}`, 2000);
         });
 
-        //Attach error handler to last source element
-        const sources = Array.from(this.stream.dom.getElementsByTagName("source"));
-        sources[sources.length - 1].addEventListener("error", this.streamError);
-
-        //Attach error handler to audio stream element
+        // Attach error handler to source tag
+        this.attachErrorHandler();
+        // Attach error handler to audio stream element
         this.stream.dom.addEventListener("error", this.streamError);
     },
     beforeMount() {
@@ -94,6 +92,13 @@ const app = new Vue({
 
     },
     methods: {
+        /**
+         * Attached error handler to last source element, this has to be re-triggered on station switch
+         */
+        attachErrorHandler() {
+            const sources = Array.from(this.stream.dom.getElementsByTagName("source"));
+            sources[sources.length - 1].addEventListener("error", this.streamError);
+        },
         /**
          * Switches to a different station in stream object and changes play state to true.
          * No action if station id is invalid
@@ -108,9 +113,8 @@ const app = new Vue({
                     this.stream.play = false;
                     // Wait for vue to update src url in audio element before triggering play()
                     Vue.nextTick(() => {
+                        this.attachErrorHandler();
                         this.catchUp();
-                        // this.stream.offline = false;
-                        // this.stream.play = true;
                     });
                     log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation);
                     return;
