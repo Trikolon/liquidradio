@@ -11,6 +11,14 @@ Vue.component("audio-visualizer", {
         barcolor: {
             type: String,
             default: "#3F51B5"
+        },
+        maxdb: {
+            type: Number,
+            default: -20
+        },
+        vertscale: {
+            type: Number,
+            default: 3
         }
     },
     data (){
@@ -40,7 +48,7 @@ Vue.component("audio-visualizer", {
 
             this.analyser = this.ctx.createAnalyser();
             this.analyser.fftSize = this.analyser.fftSize / this.divider;
-            this.analyser.maxDecibels = -20;
+            this.analyser.maxDecibels = this.maxdb;
             this.analyser.smoothingTimeConstant = 0.9;
 
             // connections to analyser and sound output
@@ -143,7 +151,7 @@ Vue.component("audio-visualizer", {
                 this.c.lineWidth = Math.max(this.barWidth - 1, 1); // -2 to have small gap
                 // offset by half because linewith goes both directions
                 this.c.moveTo(this.offset + i * this.barWidth, this.canvas.height);
-                this.c.lineTo(this.offset + i * this.barWidth, (this.canvas.height - Math.pow(this.freqBytes[i] / 255, 3) * this.canvas.height));
+                this.c.lineTo(this.offset + i * this.barWidth, (this.canvas.height - Math.pow(this.freqBytes[i] / 255, this.vertscale) * this.canvas.height));
                 this.c.stroke();
             }
 
@@ -177,12 +185,12 @@ Vue.component("audio-visualizer", {
 
             for (let i = 0; i <= this.upperbound; i++) {
 
-                let powered = Math.pow(this.freqBytes[i] / 255, 2);
+                const powered = Math.pow(this.freqBytes[i] / 255, 2);
                 // let powered = freqBytes[i] / 255; // To power, or not to power, that is the question
 
                 // radius is minDim but take away half of linewidth, then decrease each step while going through array
                 // -1 was added in order to contain outer bars inside circle outline
-                let radius = Math.max(this.minDim - 1 - this.c.lineWidth / 2 - (this.minDim / this.upperbound) * i, 0);
+                const radius = Math.max(this.minDim - 1 - this.c.lineWidth / 2 - (this.minDim / this.upperbound) * i, 0);
 
                 // draw first half
                 this.c.beginPath();
