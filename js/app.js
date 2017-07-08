@@ -84,6 +84,9 @@ const app = new Vue({
         this.attachErrorHandler();
         // Attach error handler to audio stream element
         this.stream.dom.addEventListener("error", this.streamError);
+
+        // set volume of audio element
+        this.$refs[this.stream.el].volume = this.stream.volume;
     },
     beforeMount() {
         //Set default station to first in station list.
