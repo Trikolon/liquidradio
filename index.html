@@ -93,9 +93,6 @@
                    :disabled="stream.volume === 1">
             <md-icon>add</md-icon>
         </md-button>
-        <md-button v-if="window.hasOwnProperty('screenfull') && screenfull.enabled" class="md-icon-button md-raised md-dense" v-on:click="screenfull.toggle()">
-            <md-icon>fullscreen</md-icon>
-        </md-button>
         <md-button class="md-fab md-primary" :disabled="stream.offline" v-on:click="stream.play=!stream.play">
             <md-icon>{{stream.play ? "pause" : "play_arrow"}}</md-icon>
         </md-button>
@@ -114,7 +111,6 @@
     </md-snackbar>
 </div>
 <script src="lib/loglevel/loglevel.min.js"></script>
-<script src="lib/screenfull/screenfull.min.js"></script>
 <script src="lib/vue/vue.min.js"></script>
 <script src="lib/vue-material/vue-material.js"></script>
 <script src="js/visualizer.js"></script>
