@@ -85,8 +85,16 @@ const app = new Vue({
         // Attach error handler to audio stream element
         this.stream.dom.addEventListener("error", this.streamError);
 
-        // set volume of audio element
+        // Set initial volume of audio element
         this.$refs[this.stream.el].volume = this.stream.volume;
+
+        // Bind hotkey events
+        window.onkeydown = (e) => {
+            if (e.keyCode === 32) { // Spacebar toggles play state
+                this.stream.play = !this.stream.play;
+                e.preventDefault();
+            }
+        };
     },
     beforeMount() {
         //Set default station to first in station list.
