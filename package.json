@@ -1,0 +1,43 @@
+{
+  "name": "liquidradio",
+  "version": "1.0.0",
+  "description": "Frontend for music station Liquid Radio https://liquidradio.pro",
+  "main": "public/index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "css-loader": "^0.28.4",
+    "file-loader": "^0.11.2",
+    "loglevel": "^1.4.1",
+    "style-loader": "^0.18.2",
+    "vue": "^2.3.4",
+    "vue-material": "^0.7.4",
+    "webpack": "^3.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.1.1",
+    "webpack-dev-server": "^2.5.1"
+  },
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "dev": "webpack-dev-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trikolon/liquidradio.git"
+  },
+  "keywords": [
+    "vuejs2",
+    "material-design",
+    "mobile-first",
+    "radio-station"
+  ],
+  "author": "Paul Zuehlcke",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Trikolon/liquidradio/issues"
+  },
+  "homepage": "https://liquidradio.pro",
+  "private": true
+}
