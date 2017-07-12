@@ -12,3 +12,19 @@
         <img src="https://img.shields.io/gitter/room/liquid-radio/home.svg" alt="Gitter Chat">
     </a>
 </p>
+
+### Build
+```
+npm run build
+```
+Webpack will bundle the JS and CSS resources into `public/dist/bundle.js`
+### Development
+Watch changes, compile and start local web-server for
+development (default: http://localhost:8080)
+```
+npm run dev
+```
+This will also generate source-maps and watch file changes for easier debugging.
+
+*In order to see dev log messages run ```log.setLevel("TRACE")``` in the
+browser console (F12). The default log level is ```INFO```.*
