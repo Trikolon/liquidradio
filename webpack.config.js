@@ -10,9 +10,6 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "file-loader"},
-            {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader']
             }
