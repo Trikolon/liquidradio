@@ -70,7 +70,8 @@ const app = new Vue({
         this.stream.dom.addEventListener("volumechange", () => {
             this.stream.volume = this.$refs[this.stream.el].volume;
         });
-        this.stream.dom.addEventListener("stalled", () => {
+        this.stream.dom.addEventListener("stalled", (e) => {
+            log.error("Stream stalled", e);
             this.notify("Stream stalled, check your connection.");
         });
 
