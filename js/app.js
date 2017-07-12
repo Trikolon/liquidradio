@@ -13,7 +13,7 @@ const app = new Vue({
         loglevel: "INFO",
         title: "Liquid Radio",
         repoLink: "https://github.com/Trikolon/liquidradio",
-        version: "0.5",
+        version: "1.0",
         stream: {
             play: false,
             offline: false,
