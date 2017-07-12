@@ -1,4 +1,12 @@
-Vue.use(VueMaterial);
+import * as log from "loglevel";
+import Vue from "vue";
+import VueMaterial from "vue-material";
+import 'vue-material/dist/vue-material.css'
+import "../css/app.css";
+import visualizer from "./visualizer.js";
+visualizer(); //FIXME
+
+Vue.use(VueMaterial); //FIXME?
 const app = new Vue({
     el: "#app",
     data: {
