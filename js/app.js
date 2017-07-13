@@ -60,7 +60,7 @@ const app = new Vue({
         },
         "visualizer" () {
             log.debug("visualizer watch, new value:", this.visualizer);
-            localStorage ? localStorage.setItem("visualizer", this.visualizer) : null;
+            if (localStorage) localStorage.setItem("visualizer", this.visualizer);
         }
     },
     mounted() {
@@ -160,7 +160,7 @@ const app = new Vue({
                 log.debug(`Modified volume by ${value} to ${this.stream.volume}`);
             }
             // Save volume setting to config
-            localStorage ? localStorage.setItem("volume", this.stream.volume) : null;
+            if (localStorage) localStorage.setItem("volume", this.stream.volume);
         },
         /**
          * Trigger play or pause for audio el depending on state.
