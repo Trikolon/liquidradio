@@ -16,6 +16,17 @@
     <!-- font and icons -->
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
     <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+
+    <!-- Initial css to prevent flickering -->
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        body {
+            background-color: #3a4145;
+        }
+    </style>
 </head>
 <body>
 <div id="app" class="phone-viewport" v-cloak>
@@ -58,23 +69,23 @@
             </md-list-item>
         </md-list>
         <md-list>
-                <!-- Social links -->
-                <md-list-item class="md-primary">
-                    <md-icon>share</md-icon>
-                    <span>Follow Us</span>
-                    <md-list-expand>
-                        <md-list>
-                            <md-list-item class="md-inset" v-for="link in socialLinks" :key="link.name"
-                                          :href="link.url" target="_blank" v-on:click="$refs.nav.toggle()">
-                                <span>{{link.name}}</span>
-                            </md-list-item>
-                        </md-list>
-                    </md-list-expand>
-                </md-list-item>
-                <md-list-item v-on:click="$refs.nav.toggle()" :href="repoLink" class="md-primary" target="_blank">
-                    <md-icon>code</md-icon>
-                    <span>Source</span>
-                </md-list-item>
+            <!-- Social links -->
+            <md-list-item class="md-primary">
+                <md-icon>share</md-icon>
+                <span>Follow Us</span>
+                <md-list-expand>
+                    <md-list>
+                        <md-list-item class="md-inset" v-for="link in socialLinks" :key="link.name"
+                                      :href="link.url" target="_blank" v-on:click="$refs.nav.toggle()">
+                            <span>{{link.name}}</span>
+                        </md-list-item>
+                    </md-list>
+                </md-list-expand>
+            </md-list-item>
+            <md-list-item v-on:click="$refs.nav.toggle()" :href="repoLink" class="md-primary" target="_blank">
+                <md-icon>code</md-icon>
+                <span>Source</span>
+            </md-list-item>
         </md-list>
     </md-sidenav>
     <div class="main-content">

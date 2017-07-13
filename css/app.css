@@ -1,6 +1,5 @@
 body {
     font-family: "Roboto", sans-serif;
-    background-color: #3a4145;
     color: white;
     overflow: hidden;
 }
@@ -25,7 +24,6 @@ body {
     overflow-x: hidden;
 }
 
-
 #versionInfo {
     font-size: x-small;
 }
@@ -42,8 +40,4 @@ body {
     z-index: -1;
     opacity: 0.5;
     max-height: 55vh;
-}
-
-[v-cloak]{
-    display: none;
 }
