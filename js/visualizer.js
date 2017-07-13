@@ -5,7 +5,7 @@ export default () => {
     Vue.component("audio-visualizer", {
         template: "<canvas></canvas>",
         props: {
-            audioel: {},
+            audioid: {},
             design: {
                 default: "square",
                 validator (value) {
@@ -31,20 +31,34 @@ export default () => {
                 isInitialized: false
             }
         },
-        computed: {},
-        watch: {
-            audioel(el) {
-                if (!this.isInitialized && el) {
-                    this.init();
-                    this.isInitialized = true;
-                }
-            }
-        },
         mounted() {
             window.addEventListener("resize", this.resize);
+            this.init();
+        },
+        beforeDestroy() {
+            //TODO: de-register components to fix error on visualizer toggle
+            //   this.audio.disconnect();
+            // this.ctx.close();
         },
         methods: {
             init() {
+                if (this.interval) {
+                    log.debug("Interval active");
+                    this.audioel = document.getElementById(this.audioid);
+                    log.debug("element by id returned", this.audioid, this.audioel);
+                    if (this.audioel) {
+                        log.debug("audioel found by id");
+                        clearInterval(this.interval);
+                        this._init();
+                    }
+                }
+                else {
+                    log.debug("Interval inactive, starting");
+                    this.interval = setInterval(this.init, 100);
+                    this.init();
+                }
+            },
+            _init() {
                 this.divider = 16; // data "resolution" divider
                 // get audio element & build audio analyser
                 this.ctx = new window.AudioContext();
@@ -70,10 +84,10 @@ export default () => {
 
                 this.resize();
 
-                if(this.design === "square") {
+                if (this.design === "square") {
                     requestAnimationFrame(this.draw);
                 }
-                else if(this.design === "circle") {
+                else if (this.design === "circle") {
                     requestAnimationFrame(this.drawCircle);
                 }
             },
