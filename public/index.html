@@ -107,10 +107,10 @@
             <md-icon>fast_forward</md-icon>
         </md-button>
     </div>
-    <audio ref="streamEl" preload="metadata" crossorigin="anonymous">
+    <audio id="streamEl" ref="streamEl" preload="metadata" crossorigin="anonymous">
         <source v-for="source in stream.currentStation.source" :key="source.src" :src="source.src" :type="source.type">
     </audio>
-    <audio-visualizer v-show="visualizer" id="visualizer" design="square" :audioel="stream.dom"
+    <audio-visualizer v-if="visualizer" id="visualizer" design="square" :audioid="stream.el"
                       barcolor="#E91E63"></audio-visualizer>
     <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"
                  :md-indeterminate="stream.loading"></md-progress>

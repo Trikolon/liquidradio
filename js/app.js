@@ -66,7 +66,6 @@ const app = new Vue({
     mounted() {
         this.stream.dom = this.$refs[this.stream.el];
 
-
         // Watch external changes
         this.stream.dom.addEventListener("play", () => {
             this.stream.play = true;
