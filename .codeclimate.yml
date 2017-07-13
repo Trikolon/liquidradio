@@ -13,4 +13,4 @@ ratings:
   - "**.js"
   - "**.css"
 exclude_paths:
-- "lib/"
+- "node_modules/"
