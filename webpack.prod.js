@@ -1,4 +1,5 @@
 const path = require('path');
+const BabiliPlugin = require("babili-webpack-plugin");
 
 module.exports = {
     entry: './js/app.js',
@@ -7,6 +8,9 @@ module.exports = {
         path: path.resolve("./public/", 'dist'),
         publicPath: "/dist/"
     },
+    plugins: [
+        new BabiliPlugin()
+    ],
     module: {
         loaders: [
             {
@@ -15,15 +19,10 @@ module.exports = {
             }
         ]
     },
-    devServer: {
-        contentBase: path.join(".", "public"),
-        compress: true,
-        port: 8080
-    },
+    devtool: 'source-map',
     resolve: {
         alias: {
             vue$: "vue/dist/vue.common.js"
         }
     }
-
 };

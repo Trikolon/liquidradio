@@ -12,15 +12,16 @@
     "style-loader": "^0.18.2",
     "vue": "^2.3.4",
     "vue-material": "^0.7.4",
-    "webpack": "^3.2.0"
+    "webpack": "^3.2.0",
+    "babili-webpack-plugin": "^0.1.2"
   },
   "devDependencies": {
     "eslint": "^4.1.1",
     "webpack-dev-server": "^2.5.1"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
-    "dev": "webpack-dev-server"
+    "build": "webpack --config webpack.prod.js",
+    "dev": "webpack-dev-server --config webpack.dev.js"
   },
   "repository": {
     "type": "git",
