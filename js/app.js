@@ -4,8 +4,10 @@ import VueMaterial from "vue-material";
 import 'vue-material/dist/vue-material.css'
 import "../css/app.css";
 import visualizer from "./visualizer.js";
-visualizer(); //FIXME
 
+log.debug("%cDebug messages enabled", "background: red; color: yellow; font-size: x-large");
+
+visualizer(); //FIXME
 Vue.use(VueMaterial); //FIXME?
 const app = new Vue({
     el: "#app",
