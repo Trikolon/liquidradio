@@ -49,9 +49,8 @@ export default () => {
                     this.analyser.maxDecibels = this.maxdb;
                     this.analyser.smoothingTimeConstant = 0.9;
 
-                    // connections to analyser and sound output
+                    // connect to analyser
                     this.mediaElSrc.connect(this.analyser);
-                    this.mediaElSrc.connect(this.audioContext.destination); // disable when testing
 
                     // setup data array
                     this.bufferLength = this.analyser.frequencyBinCount;
