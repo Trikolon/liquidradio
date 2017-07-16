@@ -28,8 +28,7 @@ export default () => {
         },
         data (){
             return {
-                divider: 16, // data "resolution" divider
-                isInitialized: false
+                divider: 16 // data "resolution" divider
             }
         },
         mounted() {
