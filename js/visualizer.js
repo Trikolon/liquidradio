@@ -5,7 +5,8 @@ export default () => {
     Vue.component("audio-visualizer", {
         template: "<canvas></canvas>",
         props: {
-            audioid: {},
+            audioContext: {},
+            mediaElSrc: {},
             design: {
                 default: "square",
                 validator (value) {
@@ -36,60 +37,41 @@ export default () => {
             this.init();
         },
         beforeDestroy() {
-            //TODO: de-register components to fix error on visualizer toggle
-            //   this.audio.disconnect();
-            // this.ctx.close();
+            // TODO: Check if we need to do cleanup
         },
         methods: {
             init() {
-                if (this.interval) {
-                    log.debug("Interval active");
-                    this.audioel = document.getElementById(this.audioid);
-                    log.debug("element by id returned", this.audioid, this.audioel);
-                    if (this.audioel) {
-                        log.debug("audioel found by id");
-                        clearInterval(this.interval);
-                        this._init();
+                Vue.nextTick(() => {
+                    log.debug("Visualizer variables", this.audioContext, this.mediaElSrc);
+                    this.divider = 16; // data "resolution" divider
+
+                    this.analyser = this.audioContext.createAnalyser();
+                    this.analyser.fftSize = this.analyser.fftSize / this.divider;
+                    this.analyser.maxDecibels = this.maxdb;
+                    this.analyser.smoothingTimeConstant = 0.9;
+
+                    // connections to analyser and sound output
+                    this.mediaElSrc.connect(this.analyser);
+                    this.mediaElSrc.connect(this.audioContext.destination); // disable when testing
+
+                    // setup data array
+                    this.bufferLength = this.analyser.frequencyBinCount;
+                    this.freqBytes = new Uint8Array(this.bufferLength);
+                    this.waveBytes = new Uint8Array(this.bufferLength);
+
+                    // setup canvas and canvas context variables
+                    this.canvas = this.$el;
+                    this.c = this.canvas.getContext("2d");
+
+                    this.resize();
+
+                    if (this.design === "square") {
+                        requestAnimationFrame(this.draw);
                     }
-                }
-                else {
-                    log.debug("Interval inactive, starting");
-                    this.interval = setInterval(this.init, 100);
-                    this.init();
-                }
-            },
-            _init() {
-                this.divider = 16; // data "resolution" divider
-                // get audio element & build audio analyser
-                this.ctx = new window.AudioContext();
-                this.audio = this.ctx.createMediaElementSource(this.audioel);
-
-                this.analyser = this.ctx.createAnalyser();
-                this.analyser.fftSize = this.analyser.fftSize / this.divider;
-                this.analyser.maxDecibels = this.maxdb;
-                this.analyser.smoothingTimeConstant = 0.9;
-
-                // connections to analyser and sound output
-                this.audio.connect(this.analyser);
-                this.audio.connect(this.ctx.destination); // disable when testing
-
-                // setup data array
-                this.bufferLength = this.analyser.frequencyBinCount;
-                this.freqBytes = new Uint8Array(this.bufferLength);
-                this.waveBytes = new Uint8Array(this.bufferLength);
-
-                // setup canvas and canvas context variables
-                this.canvas = this.$el;
-                this.c = this.canvas.getContext("2d");
-
-                this.resize();
-
-                if (this.design === "square") {
-                    requestAnimationFrame(this.draw);
-                }
-                else if (this.design === "circle") {
-                    requestAnimationFrame(this.drawCircle);
-                }
+                    else if (this.design === "circle") {
+                        requestAnimationFrame(this.drawCircle);
+                    }
+                });
             },
             /**
              * recalculate values needed by draw functions, supposed to be called on each resize event
@@ -151,7 +133,7 @@ export default () => {
              */
             draw() {
                 // skip logic if audio is paused or canvas is hidden
-                if (this.audioel.paused || this.canvas.offsetHeight === 0) {
+                if (this.mediaElSrc.mediaElement.paused || this.canvas.offsetHeight === 0) {
                     requestAnimationFrame(this.draw);
                     return;
                 }
@@ -182,7 +164,7 @@ export default () => {
              */
             drawCircle() {
                 // skip logic if audio is paused or canvas is hidden
-                if (this.audioel.paused || this.canvas.offsetHeight === 0) {
+                if (this.mediaElSrc.mediaElement.paused || this.canvas.offsetHeight === 0) {
                     requestAnimationFrame(this.drawCircle);
                     return;
                 }
