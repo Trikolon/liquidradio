@@ -129,7 +129,9 @@ export default () => {
                     }, 200)
                 }
                 else {
-                    requestAnimationFrame(func);
+                    setTimeout(() => {
+                        requestAnimationFrame(func);
+                    }, 30);
                 }
             },
 
