@@ -90,6 +90,7 @@
     </md-sidenav>
     <div class="main-content">
         <h3>Now playing: {{stream.currentStation.title}}</h3>
+        <p>{{stream.currentStation.description}}</p>
     </div>
     <div id="streamCtrl">
         <md-button class="md-icon-button md-raised md-dense" v-on:click="changeVolume(-0.1)"
@@ -111,11 +112,13 @@
         <source v-for="source in stream.currentStation.source" :key="source.src" :src="source.src" :type="source.type">
     </audio>
     <audio-visualizer v-if="visualizer" id="visualizer" design="square" :audio-context="stream.audioContext"
-                      :media-el-src="stream.mediaElSrc"
-                      barcolor="#E91E63"></audio-visualizer>
+                      :media-el-src="stream.mediaElSrc" barcolor="#E91E63">
+    </audio-visualizer>
     <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"
-                 :md-indeterminate="stream.loading"></md-progress>
-    <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration"><span>{{notification.message}}</span>
+                 :md-indeterminate="stream.loading">
+    </md-progress>
+    <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration">
+        <span>{{notification.message}}</span>
     </md-snackbar>
 </div>
 <script src="https://stream.liquidradio.pro/stations"></script>
