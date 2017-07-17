@@ -41,8 +41,7 @@ export default () => {
         methods: {
             init() {
                 Vue.nextTick(() => {
-                    log.debug("Visualizer variables", this.audioContext, this.mediaElSrc);
-                    this.divider = 16; // data "resolution" divider
+                    log.debug("Visualizer init", this);
 
                     this.analyser = this.audioContext.createAnalyser();
                     this.analyser.fftSize = this.analyser.fftSize / this.divider;
@@ -55,7 +54,6 @@ export default () => {
                     // setup data array
                     this.bufferLength = this.analyser.frequencyBinCount;
                     this.freqBytes = new Uint8Array(this.bufferLength);
-                    this.waveBytes = new Uint8Array(this.bufferLength);
 
                     // setup canvas and canvas context variables
                     this.canvas = this.$el;
@@ -64,10 +62,10 @@ export default () => {
                     this.resize();
 
                     if (this.design === "square") {
-                        requestAnimationFrame(this.draw);
+                        this.reqFrame(this.draw);
                     }
                     else if (this.design === "circle") {
-                        requestAnimationFrame(this.drawCircle);
+                        this.reqFrame(this.drawCircle);
                     }
                 });
             },
@@ -75,7 +73,6 @@ export default () => {
              * recalculate values needed by draw functions, supposed to be called on each resize event
              */
             recalc() {
-
                 // calculate an upper bound, we want to skip the highest frequencies in the last third of the array
                 this.upperbound = Math.round(this.freqBytes.length * 2 / 3);
 
@@ -88,12 +85,10 @@ export default () => {
                 this.minDim = Math.min(this.center[0], this.center[1]);
                 this.cBarWith = (Math.min(this.center[0], this.center[1]) / this.upperbound);
 
-                // grd = this.c.createRadialGradient(center[0], center[1], 0, center[0], center[1], Math.min(center[0], center[1]) - c.lineWidth / 2);
-                this.grd = this.c.createLinearGradient(0, 0, 0, this.canvas.height); // alternative
+                this.grd = this.c.createLinearGradient(0, 0, 0, this.canvas.height);
                 this.grd.addColorStop(0, "white");
                 this.grd.addColorStop(1, "#1A237E");
 
-                // this.c.strokeStyle = this.grd; // EXPENSIVE
                 this.c.strokeStyle = this.barcolor; // material design primary
 
                 log.debug("fftSize:           ", this.analyser.fftSize);
@@ -126,16 +121,22 @@ export default () => {
                 this.recalc();
             },
 
+            reqFrame(func) {
+                if(this.mediaElSrc.mediaElement.paused || this.canvas.offsetHeight === 0) {
+                    //wait a while and try again
+                    setTimeout(() => {
+                        this.reqFrame(func);
+                    }, 200)
+                }
+                else {
+                    requestAnimationFrame(func);
+                }
+            },
+
             /**
              * Draws vertical bars
              */
             draw() {
-                // skip logic if audio is paused or canvas is hidden
-                if (this.mediaElSrc.mediaElement.paused || this.canvas.offsetHeight === 0) {
-                    requestAnimationFrame(this.draw);
-                    return;
-                }
-
                 // get data for bars
                 this.analyser.getByteFrequencyData(this.freqBytes);
                 // clear before redraw
@@ -149,11 +150,12 @@ export default () => {
                     this.c.lineWidth = Math.max(this.barWidth - 1, 1); // -2 to have small gap
                     // offset by half because linewith goes both directions
                     this.c.moveTo(this.offset + i * this.barWidth, this.canvas.height);
-                    this.c.lineTo(this.offset + i * this.barWidth, (this.canvas.height - Math.pow(this.freqBytes[i] / 255, this.vertscale) * this.canvas.height));
+                    this.c.lineTo(this.offset + i * this.barWidth, (this.canvas.height - Math.pow(
+                        this.freqBytes[i] / 255, this.vertscale) * this.canvas.height));
                     this.c.stroke();
                 }
 
-                requestAnimationFrame(this.draw);
+                this.reqFrame(this.draw);
             },
 
 
@@ -161,12 +163,6 @@ export default () => {
              * Draws circular bars
              */
             drawCircle() {
-                // skip logic if audio is paused or canvas is hidden
-                if (this.mediaElSrc.mediaElement.paused || this.canvas.offsetHeight === 0) {
-                    requestAnimationFrame(this.drawCircle);
-                    return;
-                }
-
                 // get data for bars
                 this.analyser.getByteFrequencyData(this.freqBytes);
 
@@ -186,18 +182,21 @@ export default () => {
                     const powered = Math.pow(this.freqBytes[i] / 255, 2);
                     // let powered = freqBytes[i] / 255; // To power, or not to power, that is the question
 
-                    // radius is minDim but take away half of linewidth, then decrease each step while going through array
-                    // -1 was added in order to contain outer bars inside circle outline
-                    const radius = Math.max(this.minDim - 1 - this.c.lineWidth / 2 - (this.minDim / this.upperbound) * i, 0);
+                    // radius is minDim but take away half of linewidth, then decrease each step while going through
+                    // array. -1 was added in order to contain outer bars inside circle outline
+                    const radius = Math.max(
+                        this.minDim - 1 - this.c.lineWidth / 2 - (this.minDim / this.upperbound) * i, 0);
 
                     // draw first half
                     this.c.beginPath();
-                    this.c.arc(this.center[0], this.center[1], radius, 0.5 * Math.PI, 0.5 * Math.PI + Math.PI * powered, false);
+                    this.c.arc(this.center[0], this.center[1], radius, 0.5 * Math.PI, 0.5 * Math.PI + Math.PI * powered,
+                        false);
                     this.c.stroke();
 
                     // draw second half
                     this.c.beginPath();
-                    this.c.arc(this.center[0], this.center[1], radius, 0.5 * Math.PI, 0.5 * Math.PI - Math.PI * powered, true);
+                    this.c.arc(this.center[0], this.center[1], radius, 0.5 * Math.PI, 0.5 * Math.PI - Math.PI * powered,
+                        true);
                     this.c.stroke();
                 }
 
@@ -210,7 +209,7 @@ export default () => {
                 this.c.stroke();
                 this.c.strokeStyle = origStyle;
 
-                requestAnimationFrame(this.drawCircle);
+                this.reqFrame(this.drawCircle);
             }
         }
     });
