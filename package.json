@@ -7,13 +7,13 @@
     "lib": "lib"
   },
   "dependencies": {
+    "babili-webpack-plugin": "^0.1.2",
     "css-loader": "^0.28.4",
     "loglevel": "^1.4.1",
     "style-loader": "^0.18.2",
-    "vue": "^2.3.4",
+    "vue": "^2.4.1",
     "vue-material": "^0.7.4",
-    "webpack": "^3.2.0",
-    "babili-webpack-plugin": "^0.1.2"
+    "webpack": "^3.3.0"
   },
   "devDependencies": {
     "eslint": "^4.1.1",
