@@ -5,14 +5,12 @@ import 'vue-material/dist/vue-material.css'
 import "../css/app.css";
 import visualizer from "./visualizer.js";
 
-log.debug("%cDebug messages enabled", "background: red; color: yellow; font-size: x-large");
-
 visualizer(); //FIXME
 Vue.use(VueMaterial); //FIXME?
 const app = new Vue({
     el: "#app",
     data: {
-        loglevel: "INFO",
+        loglevel: process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG",
         title: "Liquid Radio",
         repoLink: "https://github.com/Trikolon/liquidradio",
         version: "1.0",
@@ -254,3 +252,5 @@ const app = new Vue({
     }
 });
 log.setDefaultLevel(app.loglevel);
+window.log = log;
+log.debug("%cDebug messages enabled", "background: red; color: yellow; font-size: x-large");
