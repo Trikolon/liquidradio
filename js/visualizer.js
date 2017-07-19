@@ -122,7 +122,8 @@ export default () => {
             },
 
             reqFrame(func) {
-                if(this.mediaElSrc.mediaElement.paused || this.canvas.offsetHeight === 0) {
+                if(( this.mediaElSrc.mediaElement && this.mediaElSrc.mediaElement.paused)
+                     || this.canvas.offsetHeight === 0) {
                     //wait a while and try again
                     setTimeout(() => {
                         this.reqFrame(func);
