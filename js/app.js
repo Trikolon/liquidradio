@@ -113,7 +113,7 @@ const app = new Vue({
         //Set default station to first in station list.
         //This has to be done after data init but before dom-bind.
         [this.stream.currentStation] = this.stream.stations;
-
+        this.updateDocumentTitle();
     },
     methods: {
         /**
@@ -133,6 +133,7 @@ const app = new Vue({
             for (let i = 0; i < this.stream.stations.length; i++) {
                 if (this.stream.stations[i].id === id) {
                     this.stream.currentStation = this.stream.stations[i];
+                    this.updateDocumentTitle();
                     this.stream.play = false;
                     // Wait for vue to update src url in audio element before triggering play()
                     Vue.nextTick(() => {
@@ -144,6 +145,10 @@ const app = new Vue({
                 }
             }
             log.error("Attempted to switch to station with invalid station id", id);
+        },
+
+        updateDocumentTitle() {
+            document.title = `${this.title} |️ ${this.stream.currentStation.title}`;
         },
         /**
          * Modify stream volume by modifier value. Bounds of volume are 0 - 1
