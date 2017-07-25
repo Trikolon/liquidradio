@@ -45,22 +45,22 @@ const app = new Vue({
         ]
     },
     watch: {
-        "stream.play" (state) {
+        "stream.play"(state) {
             if (!state) {
                 this.stream.loading = false;
             }
             this.updatePlayState(state);
         },
-        "stream.offline" (state) {
+        "stream.offline"(state) {
             if (state) {
                 log.debug("Stream went offline");
                 this.stream.play = false;
             }
         },
-        "stream.volume" () {
+        "stream.volume"() {
             this.$refs[this.stream.el].volume = this.stream.volume;
         },
-        "visualizer" () {
+        "visualizer"() {
             log.debug("visualizer watch, new value:", this.visualizer);
             if (localStorage) localStorage.setItem("visualizer", this.visualizer);
         }
@@ -118,6 +118,7 @@ const app = new Vue({
     methods: {
         /**
          * Attached error handler to last source element, this has to be re-triggered on station switch
+         * @returns {undefined}
          */
         attachErrorHandler() {
             const sources = Array.from(this.stream.dom.getElementsByTagName("source"));
@@ -126,7 +127,8 @@ const app = new Vue({
         /**
          * Switches to a different station in stream object and changes play state to true.
          * No action if station id is invalid
-         * @param id - Identifier of station to switch to.
+         * @param {String} id - Identifier of station to switch to.
+         * @returns {undefined}
          */
         switchStation(id) {
             if (id === this.stream.currentStation.id) return;
@@ -152,7 +154,8 @@ const app = new Vue({
         },
         /**
          * Modify stream volume by modifier value. Bounds of volume are 0 - 1
-         * @param value - Positive or negative number that will be added.
+         * @param {Number} value - Positive or negative number that will be added.
+         * @returns {undefined}
          */
         changeVolume(value) {
             if (this.stream.volume + value > 1) {
@@ -172,7 +175,8 @@ const app = new Vue({
         },
         /**
          * Trigger play or pause for audio el depending on state.
-         * @param state - true if play, false if pause.
+         * @param {Boolean} state - true if play, false if pause.
+         * @returns {undefined}
          */
         updatePlayState(state) {
             const el = this.$refs[this.stream.el];
@@ -188,6 +192,7 @@ const app = new Vue({
         },
         /**
          * Reloads audio element to catch up in stream.
+         * @returns {undefined}
          */
         catchUp() {
             this.stream.dom.load();
@@ -201,7 +206,8 @@ const app = new Vue({
         },
         /**
          * Error handler audio stream.
-         * @param e - Event fired including error information.
+         * @param {Event} e - Event fired including error information.
+         * @returns {undefined}
          */
         streamError(e) {
             log.error("Error in stream", e);
@@ -243,14 +249,13 @@ const app = new Vue({
         },
         /**
          * Shows notification
-         * @param message - Text for notification.
-         * @param duration - Duration of visibility.
+         * @param {String} message - Text for notification.
+         * @param {Number} duration - Duration of visibility.
+         * @returns {undefined}
          */
-        notify(message, duration) {
+        notify(message, duration = 4000) {
             const el = this.$refs[this.notification.el];
-            if (duration) {
-                this.notification.duration = duration;
-            }
+            this.notification.duration = duration;
             this.notification.message = message;
             el.open();
         }
