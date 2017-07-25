@@ -38,7 +38,7 @@ export default () => {
             }
         },
         computed: {
-            maxFPS_ms() {
+            maxFPSMS() {
                 return 1000 / this.maxFPS;
             }
         },
@@ -83,6 +83,7 @@ export default () => {
             },
             /**
              * recalculate values needed by draw functions, supposed to be called on each resize event
+             * @returns {undefined}
              */
             recalc() {
                 // calculate an upper bound, we want to skip the highest frequencies in the last third of the array
@@ -114,6 +115,7 @@ export default () => {
             /**
              * checks on window resize if canvas dimensions have changed. If so, update canvas client dimensions.
              * If step is skipped, canvas will be scaled and appears blurry.
+             * @returns {undefined}
              */
             resize() {
                 log.debug("resize event triggered");
@@ -137,6 +139,7 @@ export default () => {
              * Method to manage draw trigger
              * Limits FPS to this.maxFPS
              * Idle mode if audio element is paused, not visible or not ready yet
+             * @returns {undefined}
              */
             reqFrame() {
                 if (( this.mediaElSrc.mediaElement && this.mediaElSrc.mediaElement.paused)
@@ -148,7 +151,7 @@ export default () => {
                 }
                 else {
                     const now = window.performance.now();
-                    if ((now - this.frameLimit) > this.maxFPS_ms) {
+                    if ((now - this.frameLimit) > this.maxFPSMS) {
                         // Draw
                         this.draw();
                         this.frameLimit = now;
@@ -159,6 +162,7 @@ export default () => {
 
             /**
              * Draws vertical bars
+             * @returns {undefined}
              */
             drawSquare() {
                 // get data for bars
@@ -183,6 +187,7 @@ export default () => {
 
             /**
              * Draws circular bars
+             * @returns {undefined}
              */
             drawCircle() {
                 // get data for bars

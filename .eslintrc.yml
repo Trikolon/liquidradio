@@ -2,7 +2,7 @@
 parserOptions:
   sourceType: module
   ecmaFeatures:
-    jsx: true
+    jsx: false
 
 env:
   amd: false
@@ -46,7 +46,7 @@ rules:
   no-unsafe-finally: off
   no-unsafe-negation: off
   use-isnan: error
-  valid-jsdoc: off
+  valid-jsdoc: warn
   valid-typeof: error
 
   # Best Practices
@@ -69,7 +69,7 @@ rules:
   no-case-declarations: error
   no-div-regex: error
   no-else-return: off
-  no-empty-function: off
+  no-empty-function: warn
   no-empty-pattern: error
   no-eq-null: error
   no-eval: error
@@ -114,8 +114,8 @@ rules:
   no-unused-labels: off
   no-useless-call: error
   no-useless-concat: error
-  no-useless-escape: off
-  no-useless-return: off
+  no-useless-escape: warn
+  no-useless-return: warn
   no-void: error
   no-warning-comments: off
   no-with: error
@@ -140,8 +140,8 @@ rules:
   no-undef-init: error
   no-undef: off
   no-undefined: off
-  no-unused-vars: off
-  no-use-before-define: off
+  no-unused-vars: error
+  no-use-before-define: warn
 
   # Node.js and CommonJS
   callback-return: error
@@ -159,12 +159,12 @@ rules:
   array-bracket-spacing: off
   block-spacing: off
   brace-style: off
-  camelcase: off
+  camelcase: warn
   capitalized-comments: off
   comma-dangle:
     - error
     - never
-  comma-spacing: off
+  comma-spacing: warn
   comma-style: off
   computed-property-spacing: off
   consistent-this: off
@@ -175,7 +175,7 @@ rules:
   func-style: off
   id-length: off
   id-match: off
-  indent: off
+  indent: ["warn", 4, {"SwitchCase": 1}]
   jsx-quotes: off
   key-spacing: off
   keyword-spacing: off
@@ -212,11 +212,11 @@ rules:
   no-plusplus: off
   no-restricted-syntax: off
   no-spaced-func: off
-  no-tabs: off
+  no-tabs: error
   no-ternary: off
   no-trailing-spaces: off
   no-underscore-dangle: off
-  no-unneeded-ternary: off
+  no-unneeded-ternary: warn
   object-curly-newline: off
   object-curly-spacing: off
   object-property-newline: off
