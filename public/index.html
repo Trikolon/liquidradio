@@ -113,9 +113,11 @@
     <audio id="streamEl" ref="streamEl" preload="metadata" crossorigin="anonymous">
         <source v-for="source in stream.currentStation.source" :key="source.src" :src="source.src" :type="source.type">
     </audio>
-    <audio-visualizer v-if="visualizer && stream.play" id="visualizer" design="square" :audio-context="stream.audioContext"
-                      :media-el-src="stream.mediaElSrc" barcolor="#E91E63">
-    </audio-visualizer>
+    <transition name="fade">
+        <audio-visualizer v-if="visualizer && stream.play" id="visualizer" design="square" :audio-context="stream.audioContext"
+                          :media-el-src="stream.mediaElSrc" barcolor="#E91E63">
+        </audio-visualizer>
+    </transition>
     <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"
                  :md-indeterminate="stream.loading">
     </md-progress>

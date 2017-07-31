@@ -38,6 +38,13 @@ body {
 #visualizer {
     width: 100%;
     z-index: -1;
-    opacity: 0.5;
+    /*opacity: 0.5;*/ /*FIXME: final opacity should be 0.5*/
     max-height: 55vh;
+}
+
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s
+}
+.fade-enter, .fade-leave-to {
+    opacity: 0
 }
