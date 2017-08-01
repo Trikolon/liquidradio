@@ -163,7 +163,7 @@ const app = new Vue({
         },
 
         updateDocumentTitle() {
-            document.title = `${this.title} |️ ${this.stream.currentStation.title}`;
+            document.title = `${this.stream.currentStation.title} |️ ${this.title}`;
         },
         /**
          * Modify stream volume by modifier value. Bounds of volume are 0 - 1
