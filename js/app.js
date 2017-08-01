@@ -32,7 +32,10 @@ const app = new Vue({
             position: "bottom center",
             el: "notification-bar"
         },
-        visualizer: JSON.parse(localStorage ? localStorage.getItem("visualizer") || "true" : "true"),
+        visualizer: {
+            enabled: JSON.parse(localStorage ? localStorage.getItem("visualizer") || "true" : "true"),
+            supported: true
+        },
         socialLinks: [
             {
                 name: "Facebook",
@@ -60,24 +63,25 @@ const app = new Vue({
         "stream.volume"() {
             this.$refs[this.stream.el].volume = this.stream.volume;
         },
-        "visualizer"() {
-            log.debug("visualizer watch, new value:", this.visualizer);
-            if (localStorage) localStorage.setItem("visualizer", this.visualizer);
+        "visualizer.enabled"() {
+            log.debug("visualizer watch, new value:", this.visualizer.enabled);
+            if (localStorage) localStorage.setItem("visualizer", this.visualizer.enabled);
         }
     },
     mounted() {
         this.stream.dom = this.$refs[this.stream.el]; // Get and save dom for further use
-        this.stream.audioContext = window.AudioContext || window.webkitAudioContext || false;
+        const AudioContext = window.AudioContext || window.webkitAudioContext || false;
 
         // Check if AudioContext is supported by browser
-        if(this.stream.audioContext) {
+        if (AudioContext) {
             this.stream.audioContext = new AudioContext(); // Create audio context for visualizer
             this.stream.mediaElSrc = this.stream.audioContext.createMediaElementSource(this.stream.dom); // for visualizer
             this.stream.mediaElSrc.connect(this.stream.audioContext.destination); // connect so we have audio
         }
         else {
             // If not supported by browser disable visualizer
-            this.visualizer = false;
+            this.visualizer.enabled = false;
+            this.visualizer.supported = false;
         }
 
         // Attach event listeners to stream dom to watch external changes

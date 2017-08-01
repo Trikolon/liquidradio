@@ -67,7 +67,7 @@
             <md-list-item class="md-primary">
                 <md-icon>graphic_eq</md-icon>
                 <span>Visualizer</span>
-                <md-switch v-model="visualizer" class="md-primary"></md-switch>
+                <md-switch :disabled="!visualizer.supported" v-model="visualizer.enabled" class="md-primary"></md-switch>
             </md-list-item>
         </md-list>
         <md-list>
@@ -114,7 +114,7 @@
         <source v-for="source in stream.currentStation.source" :key="source.src" :src="source.src" :type="source.type">
     </audio>
     <transition name="fade">
-        <audio-visualizer v-if="visualizer && stream.play" id="visualizer" design="square" :audio-context="stream.audioContext"
+        <audio-visualizer v-if="visualizer.enabled && visualizer.supported && stream.play" id="visualizer" design="square" :audio-context="stream.audioContext"
                           :media-el-src="stream.mediaElSrc" barcolor="#E91E63">
         </audio-visualizer>
     </transition>
