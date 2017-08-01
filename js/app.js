@@ -67,9 +67,18 @@ const app = new Vue({
     },
     mounted() {
         this.stream.dom = this.$refs[this.stream.el]; // Get and save dom for further use
-        this.stream.audioContext = new AudioContext(); // Create audio context for visualizer
-        this.stream.mediaElSrc = this.stream.audioContext.createMediaElementSource(this.stream.dom); // for visualizer
-        this.stream.mediaElSrc.connect(this.stream.audioContext.destination); // connect so we have audio
+        this.stream.audioContext = window.AudioContext || window.webkitAudioContext || false;
+
+        // Check if AudioContext is supported by browser
+        if(this.stream.audioContext) {
+            this.stream.audioContext = new AudioContext(); // Create audio context for visualizer
+            this.stream.mediaElSrc = this.stream.audioContext.createMediaElementSource(this.stream.dom); // for visualizer
+            this.stream.mediaElSrc.connect(this.stream.audioContext.destination); // connect so we have audio
+        }
+        else {
+            // If not supported by browser disable visualizer
+            this.visualizer = false;
+        }
 
         // Attach event listeners to stream dom to watch external changes
         this.stream.dom.addEventListener("play", () => {
