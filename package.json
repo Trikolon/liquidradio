@@ -15,13 +15,13 @@
     "css-loader": "^0.28.4",
     "loglevel": "^1.4.1",
     "style-loader": "^0.18.2",
-    "vue": "^2.4.1",
+    "vue": "^2.4.2",
     "vue-material": "^0.7.4",
-    "webpack": "^3.3.0"
+    "webpack": "^3.4.1"
   },
   "devDependencies": {
-    "eslint": "^4.1.1",
-    "webpack-dev-server": "^2.5.1"
+    "eslint": "^4.3.0",
+    "webpack-dev-server": "^2.6.1"
   },
   "scripts": {
     "build": "webpack --define process.env.NODE_ENV=\"'production'\" --config webpack.prod.js",
