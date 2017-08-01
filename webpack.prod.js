@@ -12,7 +12,7 @@ module.exports = {
         new BabiliPlugin()
     ],
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader']
@@ -32,7 +32,7 @@ module.exports = {
     devtool: 'source-map',
     resolve: {
         alias: {
-            vue$: "vue/dist/vue.common.js"
+            vue$: "vue/dist/vue.esm.js"
         }
     }
 };
