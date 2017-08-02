@@ -18,7 +18,7 @@ const app = new Vue({
         loglevel: process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG",
         title: "Liquid Radio",
         repoLink: "https://github.com/Trikolon/liquidradio",
-        version: "1.1.0",
+        version: "1.1.1",
         stream: {
             play: false,
             offline: false,
