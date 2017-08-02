@@ -1,13 +1,18 @@
 import * as log from "loglevel";
 import Vue from "vue";
+import VueRouter from "vue-router";
 import VueMaterial from "vue-material";
 import 'vue-material/dist/vue-material.css'
 import "../css/app.css";
 import visualizer from "./visualizer.js";
 
 visualizer(); //FIXME
-Vue.use(VueMaterial); //FIXME?
+Vue.use(VueMaterial);
+Vue.use(VueRouter);
+
+const router = new VueRouter({});
 const app = new Vue({
+    router,
     el: "#app",
     data: {
         loglevel: process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG",
@@ -24,6 +29,7 @@ const app = new Vue({
             audioContext: undefined,
             mediaElSrc: undefined,
             currentStation: undefined,
+            defaultStation: "liquid_radio",
             stations
         },
         notification: {
@@ -48,6 +54,14 @@ const app = new Vue({
         ]
     },
     watch: {
+        "$route"(to) {
+            try {
+                this.switchStation(to.path.substring(1), false);
+            }
+            catch (e) {
+                this.switchStation(this.stream.defaultStation, false);
+            }
+        },
         "stream.play"(state) {
             if (!state) {
                 this.stream.loading = false;
@@ -123,9 +137,21 @@ const app = new Vue({
         };
     },
     beforeMount() {
-        //Set default station to first in station list.
+        //Set initial station according to url parameter or liquid_radio as fallback
         //This has to be done after data init but before dom-bind.
-        [this.stream.currentStation] = this.stream.stations;
+        if (this.$route.path === "/") {
+            this.switchStation(this.stream.defaultStation, false);
+        }
+        else {
+            try {
+                this.switchStation(this.$route.path.substring(1), false);
+            }
+            catch (e) {
+                log.debug(`Route url ${this.$route.path} doesn't contain valid station id, fallback to default.`);
+                this.switchStation(this.stream.defaultStation, false);
+            }
+
+        }
         this.updateDocumentTitle();
     },
     methods: {
@@ -141,10 +167,12 @@ const app = new Vue({
          * Switches to a different station in stream object and changes play state to true.
          * No action if station id is invalid
          * @param {String} id - Identifier of station to switch to.
+         * @param {Boolean} play - Flag whether play should be triggered after station switch
+         * @throws {Error} - If id is invalid or not found
          * @returns {undefined}
          */
-        switchStation(id) {
-            if (id === this.stream.currentStation.id) return;
+        switchStation(id, play = true) {
+            if (this.stream.currenStation && id === this.stream.currentStation.id) return;
             for (let i = 0; i < this.stream.stations.length; i++) {
                 if (this.stream.stations[i].id === id) {
                     this.stream.currentStation = this.stream.stations[i];
@@ -153,13 +181,14 @@ const app = new Vue({
                     // Wait for vue to update src url in audio element before triggering play()
                     Vue.nextTick(() => {
                         this.attachErrorHandler();
-                        this.catchUp();
+                        this.catchUp(play);
                     });
+                    router.push(id);
                     log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation);
                     return;
                 }
             }
-            log.error("Attempted to switch to station with invalid station id", id);
+            throw new Error(`Attempted to switch to station with invalid station id ${id}`);
         },
 
         updateDocumentTitle() {
@@ -205,16 +234,21 @@ const app = new Vue({
         },
         /**
          * Reloads audio element to catch up in stream.
+         * @param {Boolean} play - Flag whether play should be triggered after audio el reload
          * @returns {undefined}
          */
-        catchUp() {
+        catchUp(play = true) {
             this.stream.dom.load();
-            if (this.stream.play) {
-                this.updatePlayState(true);
+
+            if (play) {
+                if (this.stream.play) {
+                    this.updatePlayState(true);
+                }
+                else { // Stream play state was false before, set it to true (watcher will handle the dom play)
+                    this.stream.play = true;
+                }
             }
-            else { // Stream play state was false before, set it to true (watcher will handle the dom play)
-                this.stream.play = true;
-            }
+
             this.stream.offline = false;
         },
         /**
