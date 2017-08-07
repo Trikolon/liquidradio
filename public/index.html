@@ -123,6 +123,7 @@
     </md-progress>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration">
         <span>{{notification.message}}</span>
+        <md-button v-if="notification.trigger" class="md-accent" @click="notification.trigger.func">{{notification.trigger.text}}</md-button>
     </md-snackbar>
 </div>
 <script src="https://stream.liquidradio.pro/stations"></script>
