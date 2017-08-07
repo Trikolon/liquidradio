@@ -36,6 +36,7 @@ const app = new Vue({
             message: "",
             duration: 4000,
             position: "bottom center",
+            trigger: undefined,
             el: "notification-bar"
         },
         visualizer: {
@@ -259,6 +260,7 @@ const app = new Vue({
         streamError(e) {
             log.error("Error in stream", e);
             let msg = "Unknown Error";
+            let trigger;
 
             // Error from source tag
             if (e.target.nodeName === "SOURCE") {
@@ -267,7 +269,8 @@ const app = new Vue({
                 log.debug("NetworkState", this.stream.dom.networkState);
                 //NETWORK_NO_SOURCE
                 if (this.stream.dom.networkState === 3) {
-                    msg = "Stream offline"
+                    msg = "Station offline";
+                    trigger = {text: "Switch Station", func: this.$refs.nav.open};
                 }
             }
             // Error from audio tag
@@ -292,18 +295,20 @@ const app = new Vue({
                 }
             }
             this.stream.offline = true;
-            this.notify(msg);
+            this.notify(msg, undefined, trigger);
         },
         /**
          * Shows notification
          * @param {String} message - Text for notification.
          * @param {Number} duration - Duration of visibility.
+         * @param {Object} trigger - If set: trigger.text: Button text, trigger.func: Function for button to trigger.
          * @returns {undefined}
          */
-        notify(message, duration = 4000) {
+        notify(message, duration = 4000, trigger) {
             const el = this.$refs[this.notification.el];
             this.notification.duration = duration;
             this.notification.message = message;
+            this.notification.trigger = trigger; // May be undefined if argument is not provided
             el.open();
         }
     }
