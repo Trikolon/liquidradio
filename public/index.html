@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta name="description" content="Without Liquid Radio, the home for nonstop soulful music,
     life would be a mistake. (Friedrich N. - listening since 1871) Liquid Radio | Redefining Music Streaming">
+    <meta property="og:title" content="Liquid Radio">
+    <meta property="og:description" content="Redefining Music Streaming">
+    <meta property="og:image" content="/android-chrome-512x512.png">
     <title>Liquid Radio</title>
 
     <!-- favicon and app config -->
@@ -67,7 +70,8 @@
             <md-list-item class="md-primary">
                 <md-icon>graphic_eq</md-icon>
                 <span>Visualizer</span>
-                <md-switch :disabled="!visualizer.supported" v-model="visualizer.enabled" class="md-primary"></md-switch>
+                <md-switch :disabled="!visualizer.supported" v-model="visualizer.enabled"
+                           class="md-primary"></md-switch>
             </md-list-item>
         </md-list>
         <md-list>
@@ -114,7 +118,8 @@
         <source v-for="source in stream.currentStation.source" :key="source.src" :src="source.src" :type="source.type">
     </audio>
     <transition name="vf">
-        <audio-visualizer v-if="visualizer.enabled && visualizer.supported && stream.play" id="visualizer" design="square" :audio-context="stream.audioContext"
+        <audio-visualizer v-if="visualizer.enabled && visualizer.supported && stream.play" id="visualizer"
+                          design="square" :audio-context="stream.audioContext"
                           :media-el-src="stream.mediaElSrc" barcolor="#E91E63">
         </audio-visualizer>
     </transition>
@@ -123,7 +128,9 @@
     </md-progress>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration">
         <span>{{notification.message}}</span>
-        <md-button v-if="notification.trigger" class="md-accent" @click="notification.trigger.func">{{notification.trigger.text}}</md-button>
+        <md-button v-if="notification.trigger" class="md-accent" @click="notification.trigger.func">
+            {{notification.trigger.text}}
+        </md-button>
     </md-snackbar>
 </div>
 <script src="https://stream.liquidradio.pro/stations"></script>
