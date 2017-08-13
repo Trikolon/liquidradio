@@ -15,6 +15,12 @@
         <img src="https://img.shields.io/gitter/room/liquid-radio/home.svg" alt="Gitter Chat">
     </a>
 </p>
+<br>
+
+### Preview
+<p align="center">
+    <img src="https://i.imgur.com/ZY04Gh7.gif" alt="Preview">
+</p>
 
 ### Build
 ```
