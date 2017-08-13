@@ -18,9 +18,7 @@
 <br>
 
 ### Preview
-<p align="center">
-    <img src="https://i.imgur.com/ZY04Gh7.gif" alt="Preview">
-</p>
+![Preview](https://i.imgur.com/ZY04Gh7.gif)
 
 ### Build
 ```
