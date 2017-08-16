@@ -112,9 +112,11 @@
         </md-button>
         <md-button class="md-fab md-primary" :disabled="stream.offline" v-on:click="stream.play=!stream.play">
             <md-icon>{{stream.play ? "pause" : "play_arrow"}}</md-icon>
+            <md-tooltip md-delay="400" md-direction="top">{{stream.play ? "Pause" : "Play"}}</md-tooltip>
         </md-button>
         <md-button class="md-fab" v-on:click="catchUp()">
             <md-icon>refresh</md-icon>
+            <md-tooltip md-delay="400" md-direction="top">Reload</md-tooltip>
         </md-button>
     </div>
     <audio id="streamEl" ref="streamEl" preload="metadata" crossorigin="anonymous">
