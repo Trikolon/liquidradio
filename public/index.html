@@ -60,6 +60,9 @@
             <md-list-item class="md-primary">
                 <md-icon>music_note</md-icon>
                 <span>Stations</span>
+                <md-button class="md-icon-button" v-on:click="$refs['stationSettings'].open()">
+                    <md-icon>settings</md-icon>
+                </md-button>
                 <md-list-expand>
                     <md-list>
                         <md-list-item class="md-inset" v-for="station in stream.stations" :key="station.id"
@@ -119,6 +122,12 @@
             <md-tooltip md-delay="400" md-direction="top">Reload</md-tooltip>
         </md-button>
     </div>
+    <md-dialog ref="stationSettings">
+        <md-dialog-title>Station Settings</md-dialog-title>
+        <md-dialog-content>
+            {{this.stream.stations}}
+        </md-dialog-content>
+    </md-dialog>
     <audio id="streamEl" ref="streamEl" preload="metadata" crossorigin="anonymous">
         <source v-for="source in stream.currentStation.source" :key="source.src" :src="source.src" :type="source.type">
     </audio>
