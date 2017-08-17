@@ -123,9 +123,41 @@
         </md-button>
     </div>
     <md-dialog ref="stationSettings">
-        <md-dialog-title>Station Settings</md-dialog-title>
+        <md-dialog-title>Station Settings
+        <md-button v-on:click="resetStations()">
+            <md-icon>settings_backup_restore</md-icon>
+            Restore Defaults
+        </md-button>
+        </md-dialog-title>
         <md-dialog-content>
-            {{this.stream.stations}}
+            <md-table v-once>
+                <md-table-header>
+                    <md-table-row>
+                        <md-table-head>Name</md-table-head>
+                        <md-table-head>Description</md-table-head>
+                        <md-table-head>Sources</md-table-head>
+                    </md-table-row>
+                </md-table-header>
+
+                <md-table-body>
+                    <md-table-row v-for="station in stream.stations" :key="station.id"> <!-- TODO: dont show if default station -->
+                        <md-table-cell>
+                            <md-input-container>
+                                <md-input v-model="station.title"></md-input>
+                            </md-input-container>
+                        </md-table-cell>
+                        <md-table-cell>
+                            <md-input-container>
+                                <md-input v-model="station.description"></md-input>
+                            </md-input-container>
+                        </md-table-cell>
+                        <md-table-cell>
+                            <!-- TODO: station.source -->
+                            sources
+                        </md-table-cell>
+                    </md-table-row>
+                </md-table-body>
+            </md-table>
         </md-dialog-content>
     </md-dialog>
     <audio id="streamEl" ref="streamEl" preload="metadata" crossorigin="anonymous">

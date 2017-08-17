@@ -80,9 +80,12 @@ const app = new Vue({
             // Save volume setting to config
             if (localStorage) localStorage.setItem("volume", this.stream.volume);
         },
-        "stream.stations"() {
-            //Whenever stations array changes save it to local browser storage
-            if(localStorage) localStorage.setItem("stations", JSON.stringify(this.stream.stations));
+        "stream.stations": {
+            handler() {
+                //Whenever stations array changes save it to local browser storage
+                if(localStorage) localStorage.setItem("stations", JSON.stringify(this.stream.stations));
+            },
+            deep: true
         },
         "visualizer.enabled"() {
             log.debug("visualizer watch, new value:", this.visualizer.enabled);
@@ -95,22 +98,34 @@ const app = new Vue({
         window.removeStation = this.removeStation;
 
         // Load station config from local storage
+        // TODO: Keep default stations and custom stations properly seperated.
+        //  => Separate stations object where contents of defaultStations and customStations are pushed to
         if(localStorage) {
             let storedStations = localStorage.getItem("stations");
 
             if(storedStations) {
-                storedStations = JSON.parse(storedStations);
+                let failed = false;
+                try {
+                    storedStations = JSON.parse(storedStations);
+                }
+                catch(e) {
+                    log.error("Could not parse station config from local storage");
+                    localStorage.removeItem("stations"); // localStorage contains invalid data, lets remove it
+                    failed = true;
+                }
 
                 // This might not be the best performing way, but it ensures the format is correct. localStorage could
                 // contain invalid data; Also it prevents duplicates and default stations from being overwritten
-                storedStations.forEach((station) => {
-                    try {
-                        this.addStation(station.id, station.title, station.description, station.source);
-                    }
-                    catch(e) {
-                        log.debug("addStation() failed", e);
-                    }
-                });
+                if(!failed) {
+                    storedStations.forEach((station) => {
+                        try {
+                            this.addStation(station.id, station.title, station.description, station.source);
+                        }
+                        catch(e) {
+                            log.debug("addStation() failed", e);
+                        }
+                    });
+                }
             }
         }
 
@@ -177,13 +192,13 @@ const app = new Vue({
         // Set initial volume of audio element
         this.$refs[this.stream.el].volume = this.stream.volume;
 
-        // Bind hotkey events
-        window.onkeydown = (e) => {
-            if (e.keyCode === 32) { // Spacebar toggles play state
-                this.stream.play = !this.stream.play;
-                e.preventDefault();
-            }
-        };
+        // // Bind hotkey events // FIXME: Conflict with user input, only trigger if not in input field
+        // window.onkeydown = (e) => {
+        //     if (e.keyCode === 32) { // Spacebar toggles play state
+        //         this.stream.play = !this.stream.play;
+        //         e.preventDefault();
+        //     }
+        // };
     },
     methods: {
         /**
@@ -286,6 +301,11 @@ const app = new Vue({
                 throw new Error(`Station ${id} not found`);
             }
             this.stream.stations.splice(index, 1);
+        },
+
+        resetStations() {
+            log.debug("(TODO) Reset stations triggered");
+            // TODO
         },
 
         updateDocumentTitle() {
