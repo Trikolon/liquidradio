@@ -46,7 +46,7 @@
             <h1 class="md-title">{{title}}</h1>
         </md-toolbar>
     </md-whiteframe>
-    <md-sidenav class="md-left" ref="nav">
+    <md-sidenav class="md-left" ref="nav" v-on:close="stationEditMode = false">
         <md-toolbar class="md-small">
             <div class="md-toolbar-container">
                 <h3 class="md-title">{{title}} <sup id="versionInfo">{{version}}</sup></h3>
@@ -60,12 +60,24 @@
             <md-list-item class="md-primary">
                 <md-icon>music_note</md-icon>
                 <span>Stations</span>
-                <md-button class="md-icon-button" v-on:click="$refs['stationSettings'].open()">
-                    <md-icon>settings</md-icon>
+                <md-button class="md-icon-button" v-on:click="stationEditMode = !stationEditMode">
+                    <md-icon>{{stationEditMode ? "done" : "mode_edit"}}</md-icon>
                 </md-button>
                 <md-list-expand>
                     <md-list>
-                        <md-list-item class="md-inset" v-for="station in stream.stations" :key="station.id"
+                        <div v-if="stationEditMode">
+                            <md-list-item class="md-inset" v-for="station in stream.stations" :key="station.id"
+                                          id="station.id"
+                                          v-on:click="$refs.stationEditor.open(station.id)">
+                                <span>{{station.title}}</span>
+                                <md-icon>reorder</md-icon>
+                            </md-list-item>
+                            <md-list-item class="md-inset">
+                                <md-icon>add_circle_outline</md-icon>
+                            </md-list-item>
+                        </div>
+                        <md-list-item v-if="!stationEditMode" class="md-inset" v-for="station in stream.stations"
+                                      :key="station.id"
                                       id="station.id"
                                       v-on:click="switchStation(station.id); $refs.nav.toggle()">
                             <span>{{station.title}}</span>
@@ -122,44 +134,7 @@
             <md-tooltip md-delay="400" md-direction="top">Reload</md-tooltip>
         </md-button>
     </div>
-    <md-dialog ref="stationSettings">
-        <md-dialog-title>Station Settings
-        <md-button v-on:click="resetStations()">
-            <md-icon>settings_backup_restore</md-icon>
-            Restore Defaults
-        </md-button>
-        </md-dialog-title>
-        <md-dialog-content>
-            <md-table v-once>
-                <md-table-header>
-                    <md-table-row>
-                        <md-table-head>Name</md-table-head>
-                        <md-table-head>Description</md-table-head>
-                        <md-table-head>Sources</md-table-head>
-                    </md-table-row>
-                </md-table-header>
-
-                <md-table-body>
-                    <md-table-row v-for="station in stream.stations" :key="station.id"> <!-- TODO: dont show if default station -->
-                        <md-table-cell>
-                            <md-input-container>
-                                <md-input v-model="station.title"></md-input>
-                            </md-input-container>
-                        </md-table-cell>
-                        <md-table-cell>
-                            <md-input-container>
-                                <md-input v-model="station.description"></md-input>
-                            </md-input-container>
-                        </md-table-cell>
-                        <md-table-cell>
-                            <!-- TODO: station.source -->
-                            sources
-                        </md-table-cell>
-                    </md-table-row>
-                </md-table-body>
-            </md-table>
-        </md-dialog-content>
-    </md-dialog>
+    <station-editor ref="stationEditor" :stations="stream.stations"></station-editor>
     <audio id="streamEl" ref="streamEl" preload="metadata" crossorigin="anonymous">
         <source v-for="source in stream.currentStation.source" :key="source.src" :src="source.src" :type="source.type">
     </audio>
