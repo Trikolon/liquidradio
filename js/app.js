@@ -249,7 +249,7 @@ const app = new Vue({
         addStation(id, title, description = "", source) {
 
             // Test if arguments are defined and of the correct type
-            if (!id || !title || !source || !Array.isArray(source) || source.length === 0) {
+            if (!id || !title || !source || !Array.isArray(source) || source.length === 0 || title === "" || id === "") {
                 log.debug(arguments);
                 throw new Error("Invalid arguments for adding station");
             }
