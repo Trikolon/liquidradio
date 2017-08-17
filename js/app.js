@@ -4,9 +4,11 @@ import VueRouter from "vue-router";
 import VueMaterial from "vue-material";
 import 'vue-material/dist/vue-material.css'
 import "../css/app.css";
-import visualizer from "./visualizer.js";
+import Visualizer from "./Visualizer.js";
+import StationEditor from "./StationEditor.js"
 
-visualizer(); //FIXME
+Visualizer();
+StationEditor();
 Vue.use(VueMaterial);
 Vue.use(VueRouter);
 
@@ -32,6 +34,7 @@ const app = new Vue({
             defaultStation: "liquid_radio",
             stations
         },
+        stationEditMode: false,
         notification: {
             message: "",
             duration: 4000,
@@ -83,7 +86,7 @@ const app = new Vue({
         "stream.stations": {
             handler() {
                 //Whenever stations array changes save it to local browser storage
-                if(localStorage) localStorage.setItem("stations", JSON.stringify(this.stream.stations));
+                if (localStorage) localStorage.setItem("stations", JSON.stringify(this.stream.stations));
             },
             deep: true
         },
@@ -98,17 +101,17 @@ const app = new Vue({
         window.removeStation = this.removeStation;
 
         // Load station config from local storage
-        // TODO: Keep default stations and custom stations properly seperated.
+        // TODO: Keep default stations and custom stations properly separated.
         //  => Separate stations object where contents of defaultStations and customStations are pushed to
-        if(localStorage) {
+        if (localStorage) {
             let storedStations = localStorage.getItem("stations");
 
-            if(storedStations) {
+            if (storedStations) {
                 let failed = false;
                 try {
                     storedStations = JSON.parse(storedStations);
                 }
-                catch(e) {
+                catch (e) {
                     log.error("Could not parse station config from local storage");
                     localStorage.removeItem("stations"); // localStorage contains invalid data, lets remove it
                     failed = true;
@@ -116,12 +119,12 @@ const app = new Vue({
 
                 // This might not be the best performing way, but it ensures the format is correct. localStorage could
                 // contain invalid data; Also it prevents duplicates and default stations from being overwritten
-                if(!failed) {
+                if (!failed) {
                     storedStations.forEach((station) => {
                         try {
                             this.addStation(station.id, station.title, station.description, station.source);
                         }
-                        catch(e) {
+                        catch (e) {
                             log.debug("addStation() failed", e);
                         }
                     });
