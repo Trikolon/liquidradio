@@ -138,6 +138,11 @@ const app = new Vue({
         };
     },
     beforeMount() {
+        // FIXME DEBUG
+        window.addStation = this.addStation;
+        window.removeStation = this.removeStation;
+
+
         //Set initial station according to url parameter or liquid_radio as fallback
         //This has to be done after data init but before dom-bind.
         if (this.$route.path === "/") {
@@ -173,23 +178,89 @@ const app = new Vue({
          * @returns {undefined}
          */
         switchStation(id, play = true) {
-            if (this.stream.currenStation && id === this.stream.currentStation.id) return;
-            for (let i = 0; i < this.stream.stations.length; i++) {
-                if (this.stream.stations[i].id === id) {
-                    this.stream.currentStation = this.stream.stations[i];
-                    this.updateDocumentTitle();
-                    this.stream.play = false;
-                    // Wait for vue to update src url in audio element before triggering play()
-                    Vue.nextTick(() => {
-                        this.attachErrorHandler();
-                        this.catchUp(play);
-                    });
-                    router.push(id);
-                    log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation);
-                    return;
+            if (this.stream.currentStation && id === this.stream.currentStation.id) return;
+
+            const index = this.getStationIndex(id);
+            if (index === -1) {
+                throw new Error(`Attempted to switch to station with invalid station id ${id}`);
+            }
+            this.stream.currentStation = this.stream.stations[index];
+            this.updateDocumentTitle();
+            this.stream.play = false;
+            // Wait for vue to update src url in audio element before triggering play()
+            Vue.nextTick(() => {
+                this.attachErrorHandler();
+                this.catchUp(play);
+            });
+            router.push(id);
+            log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation);
+        },
+
+        /**
+         * Get station index by id
+         * @param {number} id - Id to query station array for.
+         * @returns {number} - Index of station in array or -1 if not found.
+         */
+        getStationIndex(id) {
+            if (id) {
+                for (let i = 0; i < this.stream.stations.length; i++) {
+                    if (this.stream.stations[i].id === id) {
+                        return i;
+                    }
                 }
             }
-            throw new Error(`Attempted to switch to station with invalid station id ${id}`);
+            return -1;
+        },
+
+        /**
+         * Add station to station array
+         * @param {String} id - Id of station to add, must be unique.
+         * @param {String} title - Display title (human readable).
+         * @param {String} description - Description of station to be shown when selected.
+         * @param {Array} source - Objects with src = url of audio stream and type to be injected into audio element.
+         * @throws {Error} if arguments are invalid or station already existing.
+         * @returns {undefined}
+         */
+        addStation(id, title, description = "", source) {
+
+            // Test if arguments are defined and of the correct type
+            if (!id || !title || !source || !Array.isArray(source) || source.length === 0) {
+                log.debug(arguments);
+                throw new Error("Invalid arguments for adding station");
+            }
+
+            // Test if station already existing
+            if (this.getStationIndex(id) !== -1) {
+                throw new Error(`Station with id ${id} already existing!`);
+            }
+
+            //Validate source object
+            for (let i = 0; i < source.length; i++) {
+                if (!source[i].hasOwnProperty("src") || !source[i].hasOwnProperty("type") || source[i].src === ""
+                    || source[i].type === "") {
+                    //TODO: test if src contains valid url
+                    log.debug("Station source array", source);
+                    throw new Error("Invalid source array for station")
+                }
+            }
+            this.stream.stations.push({id, title, description, source})
+        },
+
+        /**
+         * Remove station from station array by id
+         * @param {Number} id - Id to query station array for
+         * @throws {Error} if station id not existing
+         * @returns {undefined}
+         */
+        removeStation(id) {
+            if (!id) {
+                throw new Error("Missing mandatory argument 'id'");
+            }
+            const index = this.getStationIndex(id);
+            if (index === -1) {
+                throw new Error(`Station ${id} not found`);
+            }
+            this.stream.stations.splice(index, 1);
         },
 
         updateDocumentTitle() {
