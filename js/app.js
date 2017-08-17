@@ -77,11 +77,59 @@ const app = new Vue({
         },
         "stream.volume"() {
             this.$refs[this.stream.el].volume = this.stream.volume;
+            // Save volume setting to config
+            if (localStorage) localStorage.setItem("volume", this.stream.volume);
+        },
+        "stream.stations"() {
+            //Whenever stations array changes save it to local browser storage
+            if(localStorage) localStorage.setItem("stations", JSON.stringify(this.stream.stations));
         },
         "visualizer.enabled"() {
             log.debug("visualizer watch, new value:", this.visualizer.enabled);
             if (localStorage) localStorage.setItem("visualizer", this.visualizer.enabled);
         }
+    },
+    beforeMount() {
+        // FIXME DEBUG
+        window.addStation = this.addStation;
+        window.removeStation = this.removeStation;
+
+        // Load station config from local storage
+        if(localStorage) {
+            let storedStations = localStorage.getItem("stations");
+
+            if(storedStations) {
+                storedStations = JSON.parse(storedStations);
+
+                // This might not be the best performing way, but it ensures the format is correct. localStorage could
+                // contain invalid data; Also it prevents duplicates and default stations from being overwritten
+                storedStations.forEach((station) => {
+                    try {
+                        this.addStation(station.id, station.title, station.description, station.source);
+                    }
+                    catch(e) {
+                        log.debug("addStation() failed", e);
+                    }
+                });
+            }
+        }
+
+        //Set initial station according to url parameter or liquid_radio as fallback
+        //This has to be done after data init but before dom-bind.
+        if (this.$route.path === "/") {
+            this.switchStation(this.stream.defaultStation, false);
+        }
+        else {
+            try {
+                this.switchStation(this.$route.path.substring(1), false);
+            }
+            catch (e) {
+                log.debug(`Route url ${this.$route.path} doesn't contain valid station id, fallback to default.`);
+                this.switchStation(this.stream.defaultStation, false);
+            }
+
+        }
+        this.updateDocumentTitle();
     },
     mounted() {
         this.stream.dom = this.$refs[this.stream.el]; // Get and save dom for further use
@@ -136,29 +184,6 @@ const app = new Vue({
                 e.preventDefault();
             }
         };
-    },
-    beforeMount() {
-        // FIXME DEBUG
-        window.addStation = this.addStation;
-        window.removeStation = this.removeStation;
-
-
-        //Set initial station according to url parameter or liquid_radio as fallback
-        //This has to be done after data init but before dom-bind.
-        if (this.$route.path === "/") {
-            this.switchStation(this.stream.defaultStation, false);
-        }
-        else {
-            try {
-                this.switchStation(this.$route.path.substring(1), false);
-            }
-            catch (e) {
-                log.debug(`Route url ${this.$route.path} doesn't contain valid station id, fallback to default.`);
-                this.switchStation(this.stream.defaultStation, false);
-            }
-
-        }
-        this.updateDocumentTitle();
     },
     methods: {
         /**
@@ -243,7 +268,7 @@ const app = new Vue({
                     throw new Error("Invalid source array for station")
                 }
             }
-            this.stream.stations.push({id, title, description, source})
+            this.stream.stations.push({id, title, description, source});
         },
 
         /**
@@ -284,8 +309,6 @@ const app = new Vue({
                 this.stream.volume = Math.round((this.stream.volume + value) * 10) / 10;
                 log.debug(`Modified volume by ${value} to ${this.stream.volume}`);
             }
-            // Save volume setting to config
-            if (localStorage) localStorage.setItem("volume", this.stream.volume);
         },
         /**
          * Trigger play or pause for audio el depending on state.
