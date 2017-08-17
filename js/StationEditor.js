@@ -6,7 +6,7 @@ export default () => {
         template: "<div><md-dialog ref='dialog'>" +
         "        <md-dialog-title>Edit Station" +
         "        </md-dialog-title>" +
-        "        <md-dialog-content>" +
+        "        <md-dialog-content v-if='selectedStation'>" +
         "           <md-input-container>" +
         "               <label>Name</label>" +
         "               <md-input v-model=\"selectedStation.title\"></md-input>" +
