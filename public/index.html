@@ -72,7 +72,7 @@
                                 <span>{{station.title}}</span>
                                 <md-icon>reorder</md-icon>
                             </md-list-item>
-                            <md-list-item class="md-inset">
+                            <md-list-item class="md-inset" v-on:click="$refs.stationEditor.open()">
                                 <md-icon>add_circle_outline</md-icon>
                             </md-list-item>
                         </div>
