@@ -5,7 +5,10 @@ import Util from "./Util";
 export default () => {
     Vue.component("station-editor", {
         template: "<div><md-dialog ref='dialog' v-on:close='validationError=undefined'>" +
-        "        <md-dialog-title v-if='selectedStation'>{{selectedStation.isNew ? 'Add Station' : 'Edit Station'}}</md-dialog-title>" +
+        "        <md-dialog-title v-if='selectedStation'>" +
+        "            <div>{{selectedStation.isNew ? 'Add Station' : 'Edit Station'}}</div>" +
+        "            <md-button style='position: absolute; right: 10px; top: 10px;' class='md-icon-button'" +
+        "                v-on:click='$refs.dialog.close()'><md-icon>close</md-icon></md-button></md-dialog-title>" +
         "        <md-dialog-content v-if='selectedStation'>" +
         "           <md-input-container>" +
         "               <label>Name</label>" +
@@ -16,7 +19,8 @@ export default () => {
         "                <md-input v-model=\"selectedStation.description\"></md-input>" +
         "            </md-input-container>" +
         "            <h3>Sources</h3>" +
-        "            <md-whiteframe v-for='source in selectedStation.source' md-elevation='2' style='padding: 10px 20px; margin-bottom: 5px;'>" +
+        "            <md-whiteframe v-for='source in selectedStation.source' key='{{source.src}}' md-elevation='2'" +
+        "                style='padding: 10px 20px; margin-bottom: 5px;'>" +
         "                <md-input-container md-clearable>" +
         "                    <label>URL</label>" +
         "                    <md-input v-model='source.src'></md-input>" +
@@ -28,8 +32,9 @@ export default () => {
         "            </md-whiteframe>" +
         "            <span v-if='validationError' style='color: red'>{{validationError}}</span>" +
         "            <md-dialog-actions>" +
-        "                <md-button v-show='!selectedStation.isNew' class='md-icon-button' v-on:click='deleteHandler()'><md-icon>delete</md-icon></md-button>" +
-        "                <md-button v-show='selectedStation.isNew' class='md-icon-button' v-on:click='addStation()'><md-icon>add</md-icon></md-button> " +
+        "                <md-button v-show='!selectedStation.isNew' class='md-accent' v-on:click='deleteHandler(); $refs.dialog.close();'>delete</md-button>" +
+        "                <md-button v-show='!selectedStation.isNew' class='md-primary' v-on:click='saveStationEdit(); $refs.dialog.close();'>save</md-button> " +
+        "                <md-button v-show='selectedStation.isNew' class='md-primary' v-on:click='addStation(); $refs.dialog.close();'>add</md-button> " +
         "            </md-dialog-actions>" +
         "        </md-dialog-content>" +
         "    </md-dialog></div>",
@@ -54,7 +59,12 @@ export default () => {
              */
             open(id) {
                 if (id) {
-                    this.selectStation(id);
+                    const stationIndex = Util.getStationIndex(this.stations, id);
+                    if(stationIndex === -1) {
+                        throw new Error("StationEditor: Open called with invalid station id");
+                    }
+                    const station = this.stations[stationIndex];
+                    this.selectedStation = Util.copyObject(station);
                 }
                 else {
                     this.selectedStation = {
@@ -76,6 +86,7 @@ export default () => {
 
             /**
              * Add selectedStation to stations array
+             * Called by add button
              * @returns {undefined}
              */
             addStation() {
@@ -90,6 +101,30 @@ export default () => {
                 }
                 catch (error) {
                     log.error("User attempted to add station but it failed", this.selectedStation, error);
+                    this.validationError = error.message;
+                }
+            },
+
+            /**
+             * Validates changes to currently selected station and applies them if valid
+             * Called by save button
+             * @returns {undefined}
+             */
+            saveStationEdit() {
+                //FIXME: Doesn't apply to array, only to temp object (selectedStation)
+                // Reset error field
+                this.validationError = undefined;
+
+                try {
+                    Util.validateStation(this.selectedStation);
+                    const stationIndex = Util.getStationIndex(this.stations, this.selectedStation.id);
+                    if(stationIndex === -1) {
+                        log.error("Attempted to save station data but could not find station in array by id");
+                    }
+                    this.stations[stationIndex] = this.selectedStation;
+                }
+                catch(error) {
+                    log.error("User attempted to edit station but it failed", this.selectedStation, error);
                     this.validationError = error.message;
                 }
             },
