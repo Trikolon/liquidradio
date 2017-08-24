@@ -14,10 +14,19 @@ const util = {
     addStation(stations, id, title, description = "", source) {
 
         // Test if arguments are defined and of the correct type
-        if (!stations || !id || !title || !source || !Array.isArray(stations) || !Array.isArray(source) || source.length === 0 || title === "" || id === "") {
-            log.debug(arguments);
-            throw new Error("Invalid arguments for adding station");
+        if(!stations || !Array.isArray(stations)) {
+            throw Error("Invalid or missing stations array");
         }
+        if(!title || title === "") {
+            throw new Error("Station title is mandatory");
+        }
+        if(!id || id === "") {
+            throw new Error("Station ID is mandatory");
+        }
+        if(!source || !Array.isArray(source) || source.length === 0) {
+            throw new Error("Station source info is mandatory");
+        }
+
 
         // Test if station already existing
         if (this.getStationIndex(stations, id) !== -1) {
@@ -30,7 +39,7 @@ const util = {
                 || source[i].type === "") {
                 //TODO: test if src contains valid url
                 log.debug("Station source array", source);
-                throw new Error("Invalid source array for station")
+                throw new Error("Invalid source info for station")
             }
         }
         stations.push({id, title, description, source});
