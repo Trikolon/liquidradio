@@ -1,5 +1,6 @@
 import Vue from "vue";
 import * as log from "loglevel";
+import Util from "./Util";
 
 export default () => {
     Vue.component("station-editor", {
@@ -16,6 +17,7 @@ export default () => {
         "                <md-input v-model=\"selectedStation.description\"></md-input>" +
         "            </md-input-container>" +
         "            <md-button class='md-icon-button' v-on:click='deleteHandler()'><md-icon>delete</md-icon></md-button>" +
+        "            <md-button v-if='selectedStation.isNew' class='md-icon-button' v-on:click='addStation()'><md-icon>add</md-icon></md-button> " +
         "        </md-dialog-content>" +
         "    </md-dialog></div>",
         props: {
@@ -36,16 +38,22 @@ export default () => {
             }
         },
         methods: {
-            //TODO: On new station convert title to id (replacing space with underscore and make all lowercase)
+
+            /**
+             * Opens station editor dialog. Creates new station if id not given
+             * @param id {String} - Id of station to show
+             * @returns {undefined}
+             */
             open(id) {
                 if (id) {
                     this.selectStation(id);
                 }
                 else {
-                    let newStation = {
-                        id: "new_station",
-                        title: "New Station",
-                        description: "This is a new station.",
+                    this.selectedStation = {
+                        isNew: true,
+                        id: "",
+                        title: "",
+                        description: "",
                         source: [
                             {
                                 src: "localhost",
@@ -53,11 +61,27 @@ export default () => {
                             }
                         ]
 
-                    };
-                    this.selectedStation = newStation;
-                    stations.push(newStation); //TODO: Rather do this with addStation() on user input
+                    }
                 }
                 this.$refs.dialog.open();
+            },
+
+            /**
+             * Add selectedStation to stations array
+             * @returns {undefined}
+             */
+            addStation() {
+                // Create station id by lowercasing string and replacing space with underscore
+                this.selectedStation.id = this.selectedStation.title.replace(" ", "_").toLowerCase();
+
+                // Attempt to add it to stations array
+                try {
+                    Util.addStation(this.stations, this.selectedStation.id, this.selectedStation.title, this.selectedStation.description, this.selectedStation.source);
+                }
+                catch (e) {
+                    // TODO: user feedback
+                    log.error("User attempted to add station but it failed", this.selectedStation, e);
+                }
             },
 
             selectStation(id) {
@@ -84,62 +108,12 @@ export default () => {
                 if (!id) {
                     throw new Error("Missing mandatory argument 'id'");
                 }
-                const index = this.getStationIndex(id);
+                const index = Util.getStationIndex(this.stations, id);
                 if (index === -1) {
                     throw new Error(`Station ${id} not found`);
                 }
                 this.stream.stations.splice(index, 1);
-            },
-
-            /**
-             * Add station to station array
-             * @param {String} id - Id of station to add, must be unique.
-             * @param {String} title - Display title (human readable).
-             * @param {String} description - Description of station to be shown when selected.
-             * @param {Array} source - Objects with src = url of audio stream and type to be injected into audio element.
-             * @throws {Error} if arguments are invalid or station already existing.
-             * @returns {undefined}
-             */
-            addStation(id, title, description = "", source) {
-
-                // Test if arguments are defined and of the correct type
-                if (!id || !title || !source || !Array.isArray(source) || source.length === 0 || title === "" || id === "") {
-                    log.debug(arguments);
-                    throw new Error("Invalid arguments for adding station");
-                }
-
-                // Test if station already existing
-                if (this.getStationIndex(id) !== -1) {
-                    throw new Error(`Station with id ${id} already existing!`);
-                }
-
-                //Validate source object
-                for (let i = 0; i < source.length; i++) {
-                    if (!source[i].hasOwnProperty("src") || !source[i].hasOwnProperty("type") || source[i].src === ""
-                        || source[i].type === "") {
-                        //TODO: test if src contains valid url
-                        log.debug("Station source array", source);
-                        throw new Error("Invalid source array for station")
-                    }
-                }
-                this.stream.stations.push({id, title, description, source});
-            },
-
-            /**
-             * Get station index by id
-             * @param {number} id - Id to query station array for.
-             * @returns {number} - Index of station in array or -1 if not found.
-             */
-            getStationIndex(id) {
-                if (id) {
-                    for (let i = 0; i < this.stream.stations.length; i++) {
-                        if (this.stream.stations[i].id === id) {
-                            return i;
-                        }
-                    }
-                }
-                return -1;
-            },
+            }
         }
     })
 }

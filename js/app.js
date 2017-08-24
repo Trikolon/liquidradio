@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import VueMaterial from "vue-material";
 import 'vue-material/dist/vue-material.css'
 import "../css/app.css";
+import Util from "./Util"
 import Visualizer from "./Visualizer.js";
 import StationEditor from "./StationEditor.js"
 
@@ -96,14 +97,7 @@ const app = new Vue({
         }
     },
     beforeMount() {
-        // FIXME DEBUG
-        window.addStation = this.addStation;
-        window.removeStation = this.removeStation;
-
-        // Load station config from local storage
-        // TODO: Keep default stations and custom stations properly separated.
-        //  => Separate stations object where contents of defaultStations and customStations are pushed to
-        // StationEditor only maintains custom stations
+        // Load station config from local storage and add them to existing stations (duplicates will be discarded)
         if (localStorage) {
             let storedStations = localStorage.getItem("stations");
 
@@ -123,11 +117,10 @@ const app = new Vue({
                 if (!failed) {
                     storedStations.forEach((station) => {
                         try {
-                            //FIXME: $refs.stationEditor not bound yet. How can we utilize this method from here?
-                            this.$refs.stationEditor.addStation(station.id, station.title, station.description, station.source);
+                            Util.addStation(this.stream.stations, station.id, station.title, station.description, station.source);
                         }
                         catch (e) {
-                            log.error("addStation() failed", e); //FIXME
+                            log.debug("addStation() for local storage station failed", e);
                         }
                     });
                 }
@@ -153,6 +146,8 @@ const app = new Vue({
     },
     mounted() {
         this.stream.dom = this.$refs[this.stream.el]; // Get and save dom for further use
+
+        // JS Audio API preparations for Visualizer
         const AudioContext = window.AudioContext || window.webkitAudioContext || false;
 
         // Check if AudioContext is supported by browser
@@ -166,6 +161,7 @@ const app = new Vue({
             this.visualizer.enabled = false;
             this.visualizer.supported = false;
         }
+
 
         // Attach event listeners to stream dom to watch external changes
         this.stream.dom.addEventListener("play", () => {
@@ -225,7 +221,7 @@ const app = new Vue({
         switchStation(id, play = true) {
             if (this.stream.currentStation && id === this.stream.currentStation.id) return;
 
-            const index = this.getStationIndex(id);
+            const index = Util.getStationIndex(this.stream.stations, id);
             if (index === -1) {
                 throw new Error(`Attempted to switch to station with invalid station id ${id}`);
             }
@@ -239,22 +235,6 @@ const app = new Vue({
             });
             router.push(id);
             log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation);
-        },
-
-        /**
-         * Get station index by id
-         * @param {number} id - Id to query station array for.
-         * @returns {number} - Index of station in array or -1 if not found.
-         */
-        getStationIndex(id) {
-            if (id) {
-                for (let i = 0; i < this.stream.stations.length; i++) {
-                    if (this.stream.stations[i].id === id) {
-                        return i;
-                    }
-                }
-            }
-            return -1;
         },
 
 
