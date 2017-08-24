@@ -1,4 +1,4 @@
-import * as log from "loglevel";
+import * as loglevel from "loglevel";
 import Vue from "vue";
 import VueRouter from "vue-router";
 import VueMaterial from "vue-material";
@@ -7,6 +7,11 @@ import "../css/app.css";
 import Util from "./Util"
 import Visualizer from "./Visualizer.js";
 import StationEditor from "./StationEditor.js"
+import Station from "./Station"
+
+window.log = loglevel.getLogger("liquidradio"); // Get a custom logger to prevent webpack-dev-server from controlling it
+log.setDefaultLevel(process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG");
+log.debug("%cDebug messages enabled", "background: red; color: yellow; font-size: x-large");
 
 Visualizer();
 StationEditor();
@@ -33,7 +38,7 @@ const app = new Vue({
             mediaElSrc: undefined,
             currentStation: undefined,
             defaultStation: "liquid_radio",
-            stations
+            stations: []
         },
         stationEditMode: false,
         notification: {
@@ -97,7 +102,22 @@ const app = new Vue({
         }
     },
     beforeMount() {
-        // Load station config from local storage and add them to existing stations (duplicates will be discarded)
+
+        // 1. Add stations from server to local array
+        const failedStations = [];
+        stations.forEach((station) => {
+            try {
+                this.stream.stations.push(new Station(station.id, station.title, station.description, station.source));
+            }
+            catch(error) {
+                failedStations.push(station);
+            }
+        });
+        if(failedStations.length > 0) {
+            log.error("Some stations failed to parse", failedStations);
+        }
+
+        // 2. Load additional station config from local storage and add them to existing stations (duplicates will be discarded)
         if (localStorage) {
             let storedStations = localStorage.getItem("stations");
 
@@ -115,9 +135,10 @@ const app = new Vue({
                 // This might not be the best performing way, but it ensures the format is correct. localStorage could
                 // contain invalid data; Also it prevents duplicates and default stations from being overwritten
                 if (!failed) {
+                    log.debug("Loaded stations object from localstorage", storedStations);
                     storedStations.forEach((station) => {
                         try {
-                            Util.addStation(this.stream.stations, station.id, station.title, station.description, station.source);
+                            Util.addStationObject(this.stream.stations, Station.fromJSON(station));
                         }
                         catch (e) {
                             log.debug("addStation() for local storage station failed", e);
@@ -362,6 +383,3 @@ const app = new Vue({
         }
     }
 });
-log.setDefaultLevel(app.loglevel);
-window.log = log;
-log.debug("%cDebug messages enabled", "background: red; color: yellow; font-size: x-large");

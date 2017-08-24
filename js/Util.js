@@ -1,9 +1,9 @@
-import * as log from "loglevel"
+import Station from "./Station"
 
 const util = {
     /**
-     * Adds station to station array. Validates arguments
-     * @param {Array} stations - Array to add station to if valid
+     * Adds station to station array. Validates station arguments.
+     * @param {Array} stations - Array to add station to if valid.
      * @param {String} id - Id of station to add, must be unique.
      * @param {String} title - Display title (human readable).
      * @param {String} description - Description of station to be shown when selected.
@@ -12,49 +12,32 @@ const util = {
      * @returns {undefined}
      */
     addStation(stations, id, title, description = "", source) {
-        // Test if arguments are defined and of the correct type
-        if(!stations || !Array.isArray(stations)) {
-            throw Error("Invalid or missing stations array");
-        }
-
-        // Test if station object is valid
-        this.validateStation({id, title, description, source});
-
-        // Test if station already existing
-        if (this.getStationIndex(stations, id) !== -1) {
-            throw new Error(`Station with id ${id} already existing!`);
-        }
-
-        stations.push({id, title, description, source});
+        this.addStationObject(stations, new Station(id, title, description, source));
     },
 
     /**
-     * Validates station object.
-     * @param {Object} station - Station object to validate.
-     * @throws {Error} - If validation fails.
+     * Adds station object to station array.
+     * @param {Array} stations - Array to add station to.
+     * @param {Station} station - Station object to add to stations array.
      * @returns {undefined}
      */
-    validateStation(station) {
-        if(!station.title || station.title === "") {
-            throw new Error("Station title is mandatory");
+    addStationObject(stations, station) {
+        // Test if arguments are defined and of the correct type
+        if(!stations || !Array.isArray(stations)) {
+            throw new Error("Invalid or missing stations array");
         }
-        if(!station.id || station.id === "") {
-            throw new Error("Station ID is mandatory");
-        }
-        if(!station.source || !Array.isArray(station.source) || station.source.length === 0) {
-            throw new Error("Station source info is mandatory");
+        if(!station || !station instanceof Station) {
+            throw new Error("Invalid or missing station object");
         }
 
-        //Validate source object
-        for (let i = 0; i < station.source.length; i++) {
-            if (!station.source[i].hasOwnProperty("src") || !station.source[i].hasOwnProperty("type") || station.source[i].src === ""
-                || station.source[i].type === "") {
-                //TODO: test if src contains valid url
-                log.debug("Station source array", station.source);
-                throw new Error("Invalid source info for station")
-            }
+        // Test if station already existing in array
+        if (this.getStationIndex(stations, station.id) !== -1) {
+            throw new Error(`Station with id ${station.id} already existing!`);
         }
+
+        stations.push(station);
     },
+
 
     /**
      * Get station index by id
