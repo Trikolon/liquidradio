@@ -15,6 +15,17 @@ export default () => {
         "                <label>Description</label>" +
         "                <md-input v-model=\"selectedStation.description\"></md-input>" +
         "            </md-input-container>" +
+        "            <h3>Sources</h3>" +
+        "            <md-whiteframe v-for='source in selectedStation.source' md-elevation='2' style='padding: 10px 20px; margin-bottom: 5px;'>" +
+        "                <md-input-container md-clearable>" +
+        "                    <label>URL</label>" +
+        "                    <md-input v-model='source.src'></md-input>" +
+        "                </md-input-container>" +
+        "                <md-input-container>" +
+        "                    <label>Type</label>" +
+        "                    <md-input v-model='source.type'></md-input>" +
+        "                </md-input-container>" +
+        "            </md-whiteframe>" +
         "            <span v-if='validationError' style='color: red'>{{validationError}}</span>" +
         "            <md-dialog-actions>" +
         "                <md-button v-show='!selectedStation.isNew' class='md-icon-button' v-on:click='deleteHandler()'><md-icon>delete</md-icon></md-button>" +

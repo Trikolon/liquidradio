@@ -58,3 +58,7 @@ body {
         opacity: .5;
     }
 }
+
+.md-dialog {
+    min-width: 70vw;
+}
