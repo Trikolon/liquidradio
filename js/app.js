@@ -103,6 +103,7 @@ const app = new Vue({
         // Load station config from local storage
         // TODO: Keep default stations and custom stations properly separated.
         //  => Separate stations object where contents of defaultStations and customStations are pushed to
+        // StationEditor only maintains custom stations
         if (localStorage) {
             let storedStations = localStorage.getItem("stations");
 
@@ -122,10 +123,11 @@ const app = new Vue({
                 if (!failed) {
                     storedStations.forEach((station) => {
                         try {
-                            this.addStation(station.id, station.title, station.description, station.source);
+                            //FIXME: $refs.stationEditor not bound yet. How can we utilize this method from here?
+                            this.$refs.stationEditor.addStation(station.id, station.title, station.description, station.source);
                         }
                         catch (e) {
-                            log.debug("addStation() failed", e);
+                            log.error("addStation() failed", e); //FIXME
                         }
                     });
                 }
@@ -255,56 +257,6 @@ const app = new Vue({
             return -1;
         },
 
-        /**
-         * Add station to station array
-         * @param {String} id - Id of station to add, must be unique.
-         * @param {String} title - Display title (human readable).
-         * @param {String} description - Description of station to be shown when selected.
-         * @param {Array} source - Objects with src = url of audio stream and type to be injected into audio element.
-         * @throws {Error} if arguments are invalid or station already existing.
-         * @returns {undefined}
-         */
-        addStation(id, title, description = "", source) {
-
-            // Test if arguments are defined and of the correct type
-            if (!id || !title || !source || !Array.isArray(source) || source.length === 0 || title === "" || id === "") {
-                log.debug(arguments);
-                throw new Error("Invalid arguments for adding station");
-            }
-
-            // Test if station already existing
-            if (this.getStationIndex(id) !== -1) {
-                throw new Error(`Station with id ${id} already existing!`);
-            }
-
-            //Validate source object
-            for (let i = 0; i < source.length; i++) {
-                if (!source[i].hasOwnProperty("src") || !source[i].hasOwnProperty("type") || source[i].src === ""
-                    || source[i].type === "") {
-                    //TODO: test if src contains valid url
-                    log.debug("Station source array", source);
-                    throw new Error("Invalid source array for station")
-                }
-            }
-            this.stream.stations.push({id, title, description, source});
-        },
-
-        /**
-         * Remove station from station array by id
-         * @param {Number} id - Id to query station array for
-         * @throws {Error} if station id not existing
-         * @returns {undefined}
-         */
-        removeStation(id) {
-            if (!id) {
-                throw new Error("Missing mandatory argument 'id'");
-            }
-            const index = this.getStationIndex(id);
-            if (index === -1) {
-                throw new Error(`Station ${id} not found`);
-            }
-            this.stream.stations.splice(index, 1);
-        },
 
         resetStations() {
             log.debug("(TODO) Reset stations triggered");
