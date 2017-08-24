@@ -4,20 +4,22 @@ import Util from "./Util";
 
 export default () => {
     Vue.component("station-editor", {
-        template: "<div><md-dialog ref='dialog'>" +
-        "        <md-dialog-title>Edit Station" +
-        "        </md-dialog-title>" +
+        template: "<div><md-dialog ref='dialog' v-on:close='validationError=undefined'>" +
+        "        <md-dialog-title v-if='selectedStation'>{{selectedStation.isNew ? 'Add Station' : 'Edit Station'}}</md-dialog-title>" +
         "        <md-dialog-content v-if='selectedStation'>" +
         "           <md-input-container>" +
         "               <label>Name</label>" +
-        "               <md-input v-model=\"selectedStation.title\"></md-input>" +
+        "               <md-input required v-model=\"selectedStation.title\"></md-input>" +
         "           </md-input-container>" +
         "            <md-input-container>" +
         "                <label>Description</label>" +
         "                <md-input v-model=\"selectedStation.description\"></md-input>" +
         "            </md-input-container>" +
-        "            <md-button class='md-icon-button' v-on:click='deleteHandler()'><md-icon>delete</md-icon></md-button>" +
-        "            <md-button v-if='selectedStation.isNew' class='md-icon-button' v-on:click='addStation()'><md-icon>add</md-icon></md-button> " +
+        "            <span v-if='validationError' style='color: red'>{{validationError}}</span>" +
+        "            <md-dialog-actions>" +
+        "                <md-button v-show='!selectedStation.isNew' class='md-icon-button' v-on:click='deleteHandler()'><md-icon>delete</md-icon></md-button>" +
+        "                <md-button v-show='selectedStation.isNew' class='md-icon-button' v-on:click='addStation()'><md-icon>add</md-icon></md-button> " +
+        "            </md-dialog-actions>" +
         "        </md-dialog-content>" +
         "    </md-dialog></div>",
         props: {
@@ -28,20 +30,15 @@ export default () => {
         },
         data() {
             return {
-                selectedStation: undefined
-            }
-        },
-        mounted() {
-            log.debug("StationEditor mounted. Stations", this.stations);
-            if (stations.length > 0) {
-                this.selectedStation = stations[0];
+                selectedStation: undefined,
+                validationError: undefined
             }
         },
         methods: {
 
             /**
              * Opens station editor dialog. Creates new station if id not given
-             * @param id {String} - Id of station to show
+             * @param {String} id - Id of station to show
              * @returns {undefined}
              */
             open(id) {
@@ -71,6 +68,8 @@ export default () => {
              * @returns {undefined}
              */
             addStation() {
+                // Reset error field
+                this.validationError = undefined;
                 // Create station id by lowercasing string and replacing space with underscore
                 this.selectedStation.id = this.selectedStation.title.replace(" ", "_").toLowerCase();
 
@@ -78,9 +77,9 @@ export default () => {
                 try {
                     Util.addStation(this.stations, this.selectedStation.id, this.selectedStation.title, this.selectedStation.description, this.selectedStation.source);
                 }
-                catch (e) {
-                    // TODO: user feedback
-                    log.error("User attempted to add station but it failed", this.selectedStation, e);
+                catch (error) {
+                    log.error("User attempted to add station but it failed", this.selectedStation, error);
+                    this.validationError = error.message;
                 }
             },
 
@@ -94,7 +93,10 @@ export default () => {
             },
 
             deleteHandler() {
-                this.stations.splice(stations.indexOf(this.selectedStation), 1);
+                const index = stations.indexOf(this.selectedStation);
+                if (index !== -1) {
+                    this.stations.splice(stations.indexOf(this.selectedStation), 1);
+                }
                 this.$refs.dialog.close();
             },
 
