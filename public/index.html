@@ -112,7 +112,7 @@
             </md-list-item>
         </md-list>
     </md-sidenav>
-    <div class="main-content">
+    <div class="main-content" v-if="stream.currentStation">
         <h3>Now playing: {{stream.currentStation.title}}</h3>
         <p>{{stream.currentStation.description}}</p>
     </div>
