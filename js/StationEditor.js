@@ -1,6 +1,6 @@
-import Vue from "vue";
-import * as log from "loglevel";
-import Util from "./Util";
+import Vue from "vue"
+import Util from "./Util"
+import Station from "./Station"
 
 export default () => {
     Vue.component("station-editor", {
@@ -32,9 +32,9 @@ export default () => {
         "            </md-whiteframe>" +
         "            <span v-if='validationError' style='color: red'>{{validationError}}</span>" +
         "            <md-dialog-actions>" +
-        "                <md-button v-show='!selectedStation.isNew' class='md-accent' v-on:click='deleteHandler(); $refs.dialog.close();'>delete</md-button>" +
-        "                <md-button v-show='!selectedStation.isNew' class='md-primary' v-on:click='saveStationEdit(); $refs.dialog.close();'>save</md-button> " +
-        "                <md-button v-show='selectedStation.isNew' class='md-primary' v-on:click='addStation(); $refs.dialog.close();'>add</md-button> " +
+        "                <md-button v-show='!selectedStation.isNew' class='md-accent' v-on:click='deleteHandler()'>delete</md-button>" +
+        "                <md-button v-show='!selectedStation.isNew' class='md-primary' v-on:click='saveStationEdit()'>save</md-button> " +
+        "                <md-button v-show='selectedStation.isNew' class='md-primary' v-on:click='addStation()'>add</md-button> " +
         "            </md-dialog-actions>" +
         "        </md-dialog-content>" +
         "    </md-dialog></div>",
@@ -60,13 +60,20 @@ export default () => {
             open(id) {
                 if (id) {
                     const stationIndex = Util.getStationIndex(this.stations, id);
-                    if(stationIndex === -1) {
+                    if (stationIndex === -1) {
                         throw new Error("StationEditor: Open called with invalid station id");
                     }
-                    const station = this.stations[stationIndex];
-                    this.selectedStation = Util.copyObject(station);
+                    const station = this.stations[stationIndex].clone();
+                    // this.selectedStation = station.clone();
+                    this.selectedStation = {
+                        id: station.id,
+                        title: station.title,
+                        description: station.description,
+                        source: station.source
+                    }
                 }
                 else {
+                    // Provisional station object structure to be validated only on addStation trigger by user
                     this.selectedStation = {
                         isNew: true,
                         id: "",
@@ -79,7 +86,7 @@ export default () => {
                             }
                         ]
 
-                    }
+                    };
                 }
                 this.$refs.dialog.open();
             },
@@ -97,12 +104,15 @@ export default () => {
 
                 // Attempt to add it to stations array
                 try {
-                    Util.addStation(this.stations, this.selectedStation.id, this.selectedStation.title, this.selectedStation.description, this.selectedStation.source);
+                    Util.addStation(this.stations, this.selectedStation.id, this.selectedStation.title,
+                        this.selectedStation.description, this.selectedStation.source);
                 }
                 catch (error) {
                     log.error("User attempted to add station but it failed", this.selectedStation, error);
                     this.validationError = error.message;
+                    return;
                 }
+                this.$refs.dialog.close();
             },
 
             /**
@@ -111,39 +121,33 @@ export default () => {
              * @returns {undefined}
              */
             saveStationEdit() {
-                //FIXME: Doesn't apply to array, only to temp object (selectedStation)
+                //FIXME: Vuejs doesn't detect object change because we replace it, we should rather copy fields one by one to *old* object or manually trigger change
                 // Reset error field
                 this.validationError = undefined;
 
                 try {
-                    Util.validateStation(this.selectedStation);
                     const stationIndex = Util.getStationIndex(this.stations, this.selectedStation.id);
-                    if(stationIndex === -1) {
+                    if (stationIndex === -1) {
                         log.error("Attempted to save station data but could not find station in array by id");
                     }
-                    this.stations[stationIndex] = this.selectedStation;
+                    this.stations[stationIndex] = new Station(this.selectedStation.id, this.selectedStation.title,
+                        this.selectedStation.description, this.selectedStation.source);
                 }
-                catch(error) {
+                catch (error) {
                     log.error("User attempted to edit station but it failed", this.selectedStation, error);
                     this.validationError = error.message;
-                }
-            },
-
-            selectStation(id) {
-                for (let i = 0; i < this.stations.length; i++) {
-                    if (this.stations[i].id === id) {
-                        this.selectedStation = this.stations[i];
-                        return;
-                    }
-                }
-            },
-
-            deleteHandler() {
-                const index = stations.indexOf(this.selectedStation);
-                if (index !== -1) {
-                    this.stations.splice(stations.indexOf(this.selectedStation), 1);
+                    return;
                 }
                 this.$refs.dialog.close();
+            },
+
+
+            deleteHandler() {
+                const index = Util.getStationIndex(this.stations, this.selectedStation.id);
+                if (index !== -1) {
+                    this.stations.splice(stations.indexOf(this.selectedStation), 1);
+                    this.$refs.dialog.close();
+                }
             },
 
             /**

@@ -1,5 +1,4 @@
 import Vue from "vue";
-import * as log from "loglevel";
 
 export default () => {
     Vue.component("audio-visualizer", {
@@ -45,9 +44,6 @@ export default () => {
         mounted() {
             window.addEventListener("resize", this.resize);
             this.init();
-        },
-        beforeDestroy() {
-            // TODO: Check if we need to do cleanup
         },
         methods: {
             init() {
