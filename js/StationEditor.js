@@ -145,27 +145,10 @@ export default () => {
             deleteHandler() {
                 const index = Util.getStationIndex(this.stations, this.selectedStation.id);
                 if (index !== -1) {
-                    this.stations.splice(stations.indexOf(this.selectedStation), 1);
+                    this.stations.splice(index, 1);
                     this.$refs.dialog.close();
                 }
             },
-
-            /**
-             * Remove station from station array by id
-             * @param {Number} id - Id to query station array for
-             * @throws {Error} if station id not existing
-             * @returns {undefined}
-             */
-            removeStation(id) {
-                if (!id) {
-                    throw new Error("Missing mandatory argument 'id'");
-                }
-                const index = Util.getStationIndex(this.stations, id);
-                if (index === -1) {
-                    throw new Error(`Station ${id} not found`);
-                }
-                this.stream.stations.splice(index, 1);
-            }
         }
     })
 }
