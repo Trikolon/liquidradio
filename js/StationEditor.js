@@ -18,7 +18,12 @@ export default () => {
         "                <label>Description</label>" +
         "                <md-input v-model=\"selectedStation.description\"></md-input>" +
         "            </md-input-container>" +
-        "            <h3>Sources</h3>" +
+        "            <div style='display: flex; justify-content: space-between; align-items: center;'>" +
+        "                <h3>Sources</h3>" +
+        "                <md-button " +
+        "                        v-on:click='selectedStation.source.push({src: ``, type: ``})' " +
+        "                        class='md-icon-button md-raised md-dense'><md-icon>add</md-icon></md-button>" +
+        "            </div>" +
         "            <md-whiteframe v-for='source in selectedStation.source' key='{{source.src}}' md-elevation='2'" +
         "                style='padding: 10px 20px; margin-bottom: 5px;'>" +
         "                <md-input-container md-clearable>" +
@@ -29,12 +34,15 @@ export default () => {
         "                    <label>Type</label>" +
         "                    <md-input v-model='source.type'></md-input>" +
         "                </md-input-container>" +
+        "                <md-button style='' v-show='selectedStation.source.length > 1' " +
+        "                    v-on:click='selectedStation.source.splice(selectedStation.source.indexOf(source),1)' " +
+        "                    class='md-icon-button md-dense'><md-icon>delete</md-icon></md-button>" +
         "            </md-whiteframe>" +
         "            <span v-if='validationError' style='color: red'>{{validationError}}</span>" +
         "            <md-dialog-actions>" +
         "                <md-button v-show='!selectedStation.isNew' class='md-accent' v-on:click='deleteHandler()'>delete</md-button>" +
-        "                <md-button v-show='!selectedStation.isNew' class='md-primary' v-on:click='saveStationEdit()'>save</md-button> " +
-        "                <md-button v-show='selectedStation.isNew' class='md-primary' v-on:click='addStation()'>add</md-button> " +
+        "                <md-button v-show='!selectedStation.isNew' class='md-primary md-raised' v-on:click='saveStationEdit()'>save</md-button> " +
+        "                <md-button v-show='selectedStation.isNew' class='md-primary md-raised' v-on:click='addStation()'>add</md-button> " +
         "            </md-dialog-actions>" +
         "        </md-dialog-content>" +
         "    </md-dialog></div>",
