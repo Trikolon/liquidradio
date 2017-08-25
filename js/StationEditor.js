@@ -12,11 +12,11 @@ export default () => {
         "        <md-dialog-content v-if='selectedStation'>" +
         "           <md-input-container>" +
         "               <label>Name</label>" +
-        "               <md-input required v-model=\"selectedStation.title\"></md-input>" +
+        "               <md-input required maxlength='20' v-model=\"selectedStation.title\"></md-input>" +
         "           </md-input-container>" +
         "            <md-input-container>" +
         "                <label>Description</label>" +
-        "                <md-input v-model=\"selectedStation.description\"></md-input>" +
+        "                <md-textarea v-model=\"selectedStation.description\"></md-textarea>" +
         "            </md-input-container>" +
         "            <div style='display: flex; justify-content: space-between; align-items: center;'>" +
         "                <h3>Sources</h3>" +
@@ -28,7 +28,7 @@ export default () => {
         "                style='padding: 10px 20px; margin-bottom: 5px;'>" +
         "                <md-input-container md-clearable>" +
         "                    <label>URL</label>" +
-        "                    <md-input v-model='source.src'></md-input>" +
+        "                    <md-input required v-model='source.src'></md-input>" +
         "                </md-input-container>" +
         "                <md-input-container>" +
         "                    <label>Type</label>" +

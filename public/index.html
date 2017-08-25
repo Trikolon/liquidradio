@@ -114,7 +114,7 @@
     </md-sidenav>
     <div class="main-content" v-if="stream.currentStation">
         <h3>Now playing: {{stream.currentStation.title}}</h3>
-        <p>{{stream.currentStation.description}}</p>
+        <p style="white-space: pre-wrap;">{{stream.currentStation.description}}</p>
     </div>
     <div id="streamCtrl">
         <md-button class="md-icon-button md-raised md-dense" v-on:click="changeVolume(-0.1)"
