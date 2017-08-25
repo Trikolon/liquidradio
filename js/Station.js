@@ -54,8 +54,10 @@ export default class Station {
         //Validate source object
         for (let i = 0; i < source.length; i++) {
             if (!source[i].hasOwnProperty("src") || !source[i].hasOwnProperty("type") || source[i].src === "") {
-                //TODO: test if src contains valid url
                 throw new Error("Invalid source info for Station");
+            }
+            if(!Station.isValidSourceUrl(source[i].src)) {
+                throw new Error("Invalid source url");
             }
         }
 
@@ -69,6 +71,15 @@ export default class Station {
      */
     clone() {
         return Station.fromJSON(JSON.stringify(this));
+    }
+
+    /**
+     * Test if string is a valid station source url
+     * @param {String} url - Url to be tested.
+     */
+    static isValidSourceUrl(url)  {
+        let regex = new RegExp("https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
+        return url.match(regex);
     }
 
 

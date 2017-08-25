@@ -89,8 +89,8 @@ export default () => {
                         description: "",
                         source: [
                             {
-                                src: "localhost",
-                                type: "mp3"
+                                src: "",
+                                type: ""
                             }
                         ]
 
