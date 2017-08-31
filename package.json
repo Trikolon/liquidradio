@@ -25,7 +25,7 @@
     "webpack-dev-server": "^2.7.1"
   },
   "scripts": {
-    "build": "webpack --define process.env.NODE_ENV=\"'production'\" --config webpack.prod.js",
+    "build": "webpack  --config webpack.prod.js",
     "dev": "webpack-dev-server --config webpack.dev.js"
   },
   "repository": {

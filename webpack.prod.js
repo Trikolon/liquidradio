@@ -1,5 +1,6 @@
 const path = require('path');
 const BabiliPlugin = require("babili-webpack-plugin");
+const webpack = require('webpack');
 
 module.exports = {
     entry: './js/app.js',
@@ -9,7 +10,12 @@ module.exports = {
         publicPath: "/dist/"
     },
     plugins: [
-        new BabiliPlugin()
+        new BabiliPlugin(),
+        new webpack.DefinePlugin({
+            'process.env': {
+                'NODE_ENV': JSON.stringify('production')
+            }
+        })
     ],
     module: {
         rules: [
