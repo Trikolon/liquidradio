@@ -214,13 +214,15 @@ const app = new Vue({
         // Set initial volume of audio element
         this.$refs[this.stream.el].volume = this.stream.volume;
 
-        // // Bind hotkey events // FIXME: Conflict with user input, only trigger if not in input field
-        // window.onkeydown = (e) => {
-        //     if (e.keyCode === 32) { // Spacebar toggles play state
-        //         this.stream.play = !this.stream.play;
-        //         e.preventDefault();
-        //     }
-        // };
+        // // Bind hotkey events
+        window.onkeydown = (e) => {
+            if (e.keyCode === 32 && document.activeElement.tagName.toLowerCase() !== "input") { // Spacebar toggles play state
+                if(this.stream.offline === false) {
+                    this.stream.play = !this.stream.play;
+                    e.preventDefault();
+                }
+            }
+        };
     },
     methods: {
         /**
