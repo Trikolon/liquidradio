@@ -13,8 +13,9 @@ window.log = loglevel.getLogger("liquidradio"); // Get a custom logger to preven
 log.setDefaultLevel(process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG");
 log.debug("%cDebug messages enabled", "background: red; color: yellow; font-size: x-large");
 
-Visualizer();
-StationEditor();
+
+Vue.component("StationEditor", StationEditor);
+Vue.component("Visualizer", Visualizer);
 Vue.use(VueMaterial);
 Vue.use(VueRouter);
 
