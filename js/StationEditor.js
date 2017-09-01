@@ -129,17 +129,19 @@ export default () => {
              * @returns {undefined}
              */
             saveStationEdit() {
-                //FIXME: Vuejs doesn't detect object change because we replace it, we should rather copy fields one by one to *old* object or manually trigger change
                 // Reset error field
                 this.validationError = undefined;
-
                 try {
                     const stationIndex = Util.getStationIndex(this.stations, this.selectedStation.id);
                     if (stationIndex === -1) {
                         log.error("Attempted to save station data but could not find station in array by id");
                     }
-                    this.stations[stationIndex] = new Station(this.selectedStation.id, this.selectedStation.title,
-                        this.selectedStation.description, this.selectedStation.source);
+                    const dst = this.stations[stationIndex];
+                    const src = this.selectedStation;
+                    dst.id = src.id;
+                    dst.title = src.title;
+                    dst.description = src.description;
+                    dst.source = src.source;
                 }
                 catch (error) {
                     log.error("User attempted to edit station but it failed", this.selectedStation, error);
