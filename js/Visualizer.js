@@ -40,7 +40,11 @@ export default {
             return 1000 / this.maxFPS;
         }
     },
+    beforeDestroy() {
+        log.debug("Visualizer DESTROY", this);
+    },
     mounted() {
+        log.debug("Visualizer MOUNTED", this);
         window.addEventListener("resize", this.resize);
         this.init();
     },

@@ -76,12 +76,12 @@ export default class Station {
     /**
      * Test if string is a valid station source url
      * @param {String} url - Url to be tested.
+     * @returns {Boolean} - true if string is valid source url, else false
      */
     static isValidSourceUrl(url)  {
-        let regex = new RegExp("https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
+        const regex = new RegExp("https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
         return url.match(regex);
     }
-
 
     /**
      * Converts JSON string or already parsed JSON string to station object.

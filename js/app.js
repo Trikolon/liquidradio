@@ -5,15 +5,18 @@ import VueMaterial from "vue-material";
 import 'vue-material/dist/vue-material.css'
 import "../css/app.css";
 import Util from "./Util"
+import Station from "./Station"
+
+import StreamPlayer from "./StreamPlayer"
 import Visualizer from "./Visualizer.js";
 import StationEditor from "./StationEditor.js"
-import Station from "./Station"
 
 window.log = loglevel.getLogger("liquidradio"); // Get a custom logger to prevent webpack-dev-server from controlling it
 log.setDefaultLevel(process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG");
 log.debug("%cDebug messages enabled", "background: red; color: yellow; font-size: x-large");
 
 
+Vue.component("StreamPlayer", StreamPlayer);
 Vue.component("StationEditor", StationEditor);
 Vue.component("Visualizer", Visualizer);
 Vue.use(VueMaterial);
@@ -29,14 +32,6 @@ const app = new Vue({
         repoLink: "https://github.com/Trikolon/liquidradio",
         version: "1.2.0",
         stream: {
-            play: false,
-            offline: false,
-            loading: false,
-            volume: parseFloat(localStorage ? localStorage.getItem("volume") || "0.6" : "0.6"),
-            el: "streamEl",
-            dom: undefined,
-            audioContext: undefined,
-            mediaElSrc: undefined,
             currentStation: undefined,
             defaultStation: "liquid_radio",
             stations: []
@@ -73,23 +68,6 @@ const app = new Vue({
                 this.switchStation(this.stream.defaultStation, false);
             }
         },
-        "stream.play"(state) {
-            if (!state) {
-                this.stream.loading = false;
-            }
-            this.updatePlayState(state);
-        },
-        "stream.offline"(state) {
-            if (state) {
-                log.debug("Stream went offline");
-                this.stream.play = false;
-            }
-        },
-        "stream.volume"() {
-            this.$refs[this.stream.el].volume = this.stream.volume;
-            // Save volume setting to config
-            if (localStorage) localStorage.setItem("volume", this.stream.volume);
-        },
         "stream.stations": {
             handler() {
                 //Whenever stations array changes save it to local browser storage
@@ -97,24 +75,27 @@ const app = new Vue({
             },
             deep: true
         },
+        "stream.currentStation"() {
+            document.title = `${this.stream.currentStation.title} |️ ${this.title}`;
+        },
         "visualizer.enabled"() {
             log.debug("visualizer watch, new value:", this.visualizer.enabled);
             if (localStorage) localStorage.setItem("visualizer", this.visualizer.enabled);
         }
     },
     beforeMount() {
-
+        log.debug("Application BEFORE MOUNT", this);
         // 1. Add stations from server to local array
         const failedStations = [];
         stations.forEach((station) => {
             try {
                 this.stream.stations.push(new Station(station.id, station.title, station.description, station.source));
             }
-            catch(error) {
+            catch (error) {
                 failedStations.push(station);
             }
         });
-        if(failedStations.length > 0) {
+        if (failedStations.length > 0) {
             log.error("Some stations failed to parse", failedStations);
         }
 
@@ -149,6 +130,7 @@ const app = new Vue({
             }
         }
 
+        //FIXME: switchStation before mount could cause issues, only put station in currentStation object, do not fiddle with audio dom
         //Set initial station according to url parameter or liquid_radio as fallback
         //This has to be done after data init but before dom-bind.
         if (this.$route.path === "/") {
@@ -162,78 +144,31 @@ const app = new Vue({
                 log.debug(`Route url ${this.$route.path} doesn't contain valid station id, fallback to default.`);
                 this.switchStation(this.stream.defaultStation, false);
             }
-
         }
-        this.updateDocumentTitle();
     },
     mounted() {
-        this.stream.dom = this.$refs[this.stream.el]; // Get and save dom for further use
+        log.debug("Application MOUNTED", this);
+        //TODO: Why do all components are created => destroyed => created?
 
-        // JS Audio API preparations for Visualizer
-        const AudioContext = window.AudioContext || window.webkitAudioContext || false;
-
-        // Check if AudioContext is supported by browser
-        if (AudioContext) {
-            this.stream.audioContext = new AudioContext(); // Create audio context for visualizer
-            this.stream.mediaElSrc = this.stream.audioContext.createMediaElementSource(this.stream.dom); // for visualizer
-            this.stream.mediaElSrc.connect(this.stream.audioContext.destination); // connect so we have audio
-        }
-        else {
-            // If not supported by browser disable visualizer
+        // If player does not provide audio api data for visualizer, disable visualizer
+        if (!this.$refs.player.audioContext || !this.$refs.player.mediaElSrc) {
+            log.debug("Audio API not supported, disabling Visualizer");
             this.visualizer.enabled = false;
             this.visualizer.supported = false;
         }
 
 
-        // Attach event listeners to stream dom to watch external changes
-        this.stream.dom.addEventListener("play", () => {
-            this.stream.play = true;
-            this.stream.loading = true;
-        });
-        this.stream.dom.addEventListener("pause", () => {
-            this.stream.play = false;
-        });
-        this.stream.dom.addEventListener("volumechange", () => {
-            this.stream.volume = this.$refs[this.stream.el].volume;
-        });
-        this.stream.dom.addEventListener("stalled", (e) => {
-            log.error("Stream stalled", e);
-            this.notify("Stream stalled, check your connection.");
-        });
-
-        // Audio stream has sufficiently buffered and starts playing
-        this.stream.dom.addEventListener("playing", () => {
-            this.stream.loading = false;
-            this.notify(`Now playing ${this.stream.currentStation.title}`, 2000);
-        });
-
-        // Attach error handler to source tag
-        this.attachErrorHandler();
-        // Attach error handler to audio stream element
-        this.stream.dom.addEventListener("error", this.streamError);
-
-        // Set initial volume of audio element
-        this.$refs[this.stream.el].volume = this.stream.volume;
-
         // // Bind hotkey events
         window.onkeydown = (e) => {
-            if (e.keyCode === 32 && document.activeElement.tagName.toLowerCase() !== "input") { // Spacebar toggles play state
-                if(this.stream.offline === false) {
-                    this.stream.play = !this.stream.play;
+            if (this.$refs.player && e.keyCode === 32 && document.activeElement.tagName.toLowerCase() !== "input") { // Spacebar toggles play state
+                if (this.$refs.player.offline === false) {
+                    this.$refs.player.play = !this.$refs.player.play;
                     e.preventDefault();
                 }
             }
         };
     },
     methods: {
-        /**
-         * Attached error handler to last source element, this has to be re-triggered on station switch
-         * @returns {undefined}
-         */
-        attachErrorHandler() {
-            const sources = Array.from(this.stream.dom.getElementsByTagName("source"));
-            sources[sources.length - 1].addEventListener("error", this.streamError);
-        },
         /**
          * Switches to a different station in stream object and changes play state to true.
          * No action if station id is invalid
@@ -250,124 +185,59 @@ const app = new Vue({
                 throw new Error(`Attempted to switch to station with invalid station id ${id}`);
             }
             this.stream.currentStation = this.stream.stations[index];
-            this.updateDocumentTitle();
-            this.stream.play = false;
+
             // Wait for vue to update src url in audio element before triggering play()
             Vue.nextTick(() => {
-                this.attachErrorHandler();
-                this.catchUp(play);
+                this.$refs.player.play = false;
+                this.$refs.player.reload(play);
             });
             router.push(id);
             log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation);
         },
-
-
-        resetStations() {
-            log.debug("(TODO) Reset stations triggered");
-            // TODO
-        },
-
-        updateDocumentTitle() {
-            document.title = `${this.stream.currentStation.title} |️ ${this.title}`;
-        },
-        /**
-         * Modify stream volume by modifier value. Bounds of volume are 0 - 1
-         * @param {Number} value - Positive or negative number that will be added.
-         * @returns {undefined}
-         */
-        changeVolume(value) {
-            if (this.stream.volume + value > 1) {
-                this.stream.volume = 1;
-                log.debug("Hit upper bound for volume ctrl");
-            }
-            else if (this.stream.volume + value < 0) {
-                this.stream.volume = 0;
-                log.debug("Hit lower bound for volume ctrl");
-            }
-            else {
-                this.stream.volume = Math.round((this.stream.volume + value) * 10) / 10;
-                log.debug(`Modified volume by ${value} to ${this.stream.volume}`);
-            }
-        },
-        /**
-         * Trigger play or pause for audio el depending on state.
-         * @param {Boolean} state - true if play, false if pause.
-         * @returns {undefined}
-         */
-        updatePlayState(state) {
-            const el = this.$refs[this.stream.el];
-            log.debug("play state changed to", state);
-            if (state) {
-                el.play();
-                log.debug("started stream");
-            }
-            else {
-                el.pause();
-                log.debug("stopped stream");
-            }
-        },
-        /**
-         * Reloads audio element to catch up in stream.
-         * @param {Boolean} play - Flag whether play should be triggered after audio el reload
-         * @returns {undefined}
-         */
-        catchUp(play = true) {
-            this.stream.dom.load();
-
-            if (play) {
-                if (this.stream.play) {
-                    this.updatePlayState(true);
-                }
-                else { // Stream play state was false before, set it to true (watcher will handle the dom play)
-                    this.stream.play = true;
-                }
-            }
-
-            this.stream.offline = false;
-        },
         /**
          * Error handler audio stream.
-         * @param {Event} e - Event fired including error information.
+         * @param {Event} error - Event fired including error information.
+         * @param {Object} networkState - Additional info for stream error, maybe undefined.
          * @returns {undefined}
          */
-        streamError(e) {
-            log.error("Error in stream", e);
+        streamError(error, networkState) {
+            log.error("Error in stream", error);
             let msg = "Unknown Error";
             let trigger;
 
             // Error from source tag
-            if (e.target.nodeName === "SOURCE") {
+            if (error.target.nodeName === "SOURCE" && networkState) {
                 log.debug("Error originates from SOURCE tag");
 
-                log.debug("NetworkState", this.stream.dom.networkState);
+                log.debug("NetworkState", networkState);
                 //NETWORK_NO_SOURCE
-                if (this.stream.dom.networkState === 3) {
+                if (networkState === 3) {
                     msg = "Station offline";
                     trigger = {text: "Switch Station", func: this.$refs.nav.open};
                 }
             }
             // Error from audio tag
-            else if (e.target.nodeName === "AUDIO") {
+            else if (error.target.nodeName === "AUDIO") {
                 log.debug("Error originates from AUDIO tag");
-                log.error(e.target.error.code, e.target.error.message);
+                log.error(error.target.error.code, error.target.error.message);
                 msg = "Error: ";
 
-                switch (e.target.error.code) {
-                    case e.target.error.MEDIA_ERR_ABORTED:
+                switch (error.target.error.code) {
+                    case error.target.error.MEDIA_ERR_ABORTED:
                         msg += "Playback aborted by user.";
                         break;
-                    case e.target.error.MEDIA_ERR_NETWORK:
+                    case error.target.error.MEDIA_ERR_NETWORK:
                         msg += "Network error. Check your connection.";
                         break;
-                    case e.target.error.MEDIA_ERR_DECODE:
+                    case error.target.error.MEDIA_ERR_DECODE:
                         msg += "Decoding error.";
                         break;
                     default:
-                        msg += `Unknown error code ${e.target.code}`;
+                        msg += `Unknown error code ${error.target.code}`;
                         break;
                 }
             }
-            this.stream.offline = true;
+            this.$refs.player.offline = true;
             this.notify(msg, undefined, trigger);
         },
         /**
