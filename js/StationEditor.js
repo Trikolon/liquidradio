@@ -55,6 +55,12 @@ export default {
             validationError: undefined
         }
     },
+    beforeDestroy() {
+        log.debug("StationEditor DESTROY", this);
+    },
+    mounted() {
+        log.debug("Station editor MOUNTED", this);
+    },
     methods: {
 
         /**
@@ -147,8 +153,10 @@ export default {
             }
             this.$refs.dialog.close();
         },
-
-
+        /**
+         * Deletes currently selected station from stations array and closes StationEditor dialog
+         * @returns {undefined}
+         */
         deleteHandler() {
             const index = Util.getStationIndex(this.stations, this.selectedStation.id);
             if (index !== -1) {

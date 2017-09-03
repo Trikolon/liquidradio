@@ -25,7 +25,7 @@
     <!-- Initial css to prevent flickering -->
     <style>
         [v-cloak] {
-            display: none;
+            display: none; /* TODO: Check if display:none could cause issues, alternatively visibility: hidden*/
         }
 
         body {
@@ -116,36 +116,44 @@
         <h3>Now playing: {{stream.currentStation.title}}</h3>
         <p style="white-space: pre-wrap;">{{stream.currentStation.description}}</p>
     </div>
-    <div id="streamCtrl">
-        <md-button class="md-icon-button md-raised md-dense" v-on:click="changeVolume(-0.1)"
-                   :disabled="stream.volume === 0">
+    <div id="streamCtrl" v-if="$refs.player">
+        <md-button class="md-icon-button md-raised md-dense" v-on:click="$refs.player.changeVolume(-0.1)"
+                   :disabled="$refs.player.volume === 0">
             <md-icon>remove</md-icon>
         </md-button>
-        <md-button class="md-icon-button md-raised md-dense" v-on:click="changeVolume(0.1)"
-                   :disabled="stream.volume === 1">
+        <md-button class="md-icon-button md-raised md-dense" v-on:click="$refs.player.changeVolume(0.1)"
+                   :disabled="$refs.player.volume === 1">
             <md-icon>add</md-icon>
         </md-button>
-        <md-button class="md-fab md-primary" :disabled="stream.offline" v-on:click="stream.play=!stream.play">
-            <md-icon>{{stream.play ? "pause" : "play_arrow"}}</md-icon>
-            <md-tooltip md-delay="400" md-direction="top">{{stream.play ? "Pause" : "Play"}}</md-tooltip>
+        <md-button class="md-fab md-primary" :disabled="$refs.player.offline"
+                   v-on:click="$refs.player.play=!$refs.player.play">
+            <md-icon>{{$refs.player.play ? "pause" : "play_arrow"}}</md-icon>
+            <md-tooltip md-delay="400" md-direction="top">{{$refs.player.play ? "Pause" : "Play"}}</md-tooltip>
         </md-button>
-        <md-button class="md-fab" v-on:click="catchUp()">
+        <md-button class="md-fab" v-on:click="$refs.player.reload()">
             <md-icon>refresh</md-icon>
             <md-tooltip md-delay="400" md-direction="top">Reload</md-tooltip>
         </md-button>
     </div>
     <station-editor ref="stationEditor" :stations="stream.stations"></station-editor>
-    <audio id="streamEl" ref="streamEl" preload="metadata" crossorigin="anonymous">
-        <source v-for="source in stream.currentStation.source" :key="source.src" :src="source.src" :type="source.type">
-    </audio>
+    <stream-player
+            ref="player"
+            :station="stream.currentStation"
+            v-on:error="streamError"
+            v-on:stalled="this.notify('Stream stalled, check your connection.');"
+            v-on:playing="notify(`Now playing ${this.stream.currentStation.title}`, 2000)"
+    ></stream-player>
     <transition name="vf">
-        <audio-visualizer v-if="visualizer.enabled && visualizer.supported && stream.play" id="visualizer"
-                          design="square" :audio-context="stream.audioContext"
-                          :media-el-src="stream.mediaElSrc" barcolor="#E91E63">
-        </audio-visualizer>
+        <audio-visualizer v-if="visualizer.enabled && visualizer.supported && stream.play"
+                          id="visualizer"
+                          design="square"
+                          barcolor="#E91E63"
+                          :audio-context="$refs.player.audioContext"
+                          :media-el-src="$refs.player.mediaElSrc"
+        ></audio-visualizer>
     </transition>
-    <md-progress id="volumeBar" class="md-accent" :md-progress="stream.volume*100"
-                 :md-indeterminate="stream.loading">
+    <md-progress id="volumeBar" v-if="$refs.player" class="md-accent" :md-progress="$refs.player.volume*100"
+                 :md-indeterminate="$refs.player.loading">
     </md-progress>
     <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration">
         <span>{{notification.message}}</span>
