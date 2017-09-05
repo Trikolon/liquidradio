@@ -132,6 +132,7 @@ export default {
          * @returns {undefined}
          */
         reload(play = true) {
+            log.debug("Reloading audio element. Current play state", this.play);
             this.$refs.audioEl.load();
 
             if (play) {
