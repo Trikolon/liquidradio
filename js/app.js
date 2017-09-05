@@ -188,7 +188,6 @@ const app = new Vue({
 
             // Wait for vue to update src url in audio element before triggering play()
             Vue.nextTick(() => {
-                this.$refs.player.play = false;
                 this.$refs.player.reload(play);
             });
             router.push(id);
