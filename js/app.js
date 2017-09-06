@@ -62,11 +62,12 @@ const app = new Vue({
     },
     watch: {
         "$route"(to) {
+            log.debug("ROUTE CHANGED");
             try {
-                this.switchStation(to.path.substring(1), false);
+                this.switchStation(to.path.substring(1));
             }
             catch (e) {
-                this.switchStation(this.stream.defaultStation, false);
+                router.push(this.stream.defaultStation);
             }
         },
         "stream.stations": {
@@ -143,12 +144,12 @@ const app = new Vue({
             catch (e) {
                 log.debug(`Route url ${this.$route.path} doesn't contain valid station id, fallback to default.`);
                 this.switchStation(this.stream.defaultStation, false);
+                router.push(this.stream.defaultStation);
             }
         }
     },
     mounted() {
         log.debug("Application MOUNTED", this);
-        //TODO: Why do all components are created => destroyed => created?
 
         // If player does not provide audio api data for visualizer, disable visualizer
         if (!this.$refs.player.audioContext || !this.$refs.player.mediaElSrc) {
@@ -190,8 +191,15 @@ const app = new Vue({
             Vue.nextTick(() => {
                 this.$refs.player.reload(play);
             });
-            router.push(id);
             log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation);
+        },
+        /**
+         * Helper method triggered by station switch from dom (navigation)
+         * @param {String} path - Path to add to router
+         * @returns {undefined}
+         */
+        updateRoute(path) {
+            router.push(path);
         },
         /**
          * Error handler audio stream.
