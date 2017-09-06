@@ -106,6 +106,10 @@
                     </md-list>
                 </md-list-expand>
             </md-list-item>
+            <md-list-item v-on:click="openShareDialog()" class="md-primary">
+                <md-icon>share</md-icon>
+                <span>Share</span>
+            </md-list-item>
             <md-list-item v-on:click="$refs.nav.toggle()" :href="repoLink" class="md-primary" target="_blank">
                 <md-icon>code</md-icon>
                 <span>Source</span>

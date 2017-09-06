@@ -252,6 +252,20 @@ const app = new Vue({
             this.notification.message = message;
             this.notification.trigger = trigger; // May be undefined if argument is not provided
             el.open();
+        },
+        openShareDialog() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    text: this.title,
+                    url: window.location.href
+                })
+                    .then(() => log.debug("Shared successfully"))
+                    .catch(error => log.error("Error while sharing", error));
+            }
+            else {
+                log.debug("Sharing not supported by browser");
+            }
         }
     }
 });
