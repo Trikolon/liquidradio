@@ -48,7 +48,7 @@ const app = new Vue({
             enabled: JSON.parse(localStorage ? localStorage.getItem("visualizer") || "true" : "true"),
             supported: true
         },
-        shareSupported: navigator.hasOwnProperty("share"),
+        shareSupported: navigator.share !== undefined,
         socialLinks: [
             {
                 name: "Facebook",
@@ -254,9 +254,14 @@ const app = new Vue({
             this.notification.trigger = trigger; // May be undefined if argument is not provided
             el.open();
         },
+
+        /**
+         * Open Android share dialog on supported devices
+         * @returns {undefined}
+         */
         openShareDialog() {
-            if (navigator.share) {
-                navigator.share({
+            if (window.navigator.share) {
+                window.navigator.share({
                     title: document.title,
                     text: this.title,
                     url: window.location.href
