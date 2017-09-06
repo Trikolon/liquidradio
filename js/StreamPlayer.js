@@ -39,6 +39,7 @@ export default {
             }
         },
         "volume"() {
+            this.$refs.audioEl.volume = this.volume;
             // Save volume setting to config
             if (localStorage) localStorage.setItem("volume", this.volume);
         },
