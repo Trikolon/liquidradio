@@ -144,8 +144,7 @@
             ref="player"
             :station="stream.currentStation"
             v-on:error="streamError"
-            v-on:stalled="this.notify('Stream stalled, check your connection.');"
-            v-on:playing="notify(`Now playing ${stream.currentStation.title}`, 2000)"
+            v-on:playing="notify(`Now playing: ${stream.currentStation.title}`, 2000)"
     ></stream-player>
     <transition name="vf">
         <visualizer v-if="visualizer.enabled && visualizer.supported && $refs.player && $refs.player.play"
