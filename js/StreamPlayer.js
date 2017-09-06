@@ -31,6 +31,7 @@ export default {
                 this.loading = false;
             }
             this.updatePlayState(state);
+            this.$emit("play", state);
         },
         "offline"(state) {
             if (state) {
@@ -42,6 +43,7 @@ export default {
             this.$refs.audioEl.volume = this.volume;
             // Save volume setting to config
             if (localStorage) localStorage.setItem("volume", this.volume);
+            this.$emit("volumechange");
         },
         "$refs.audioEl.networkState"(state) {
             log.debug("Network state changed", state);
@@ -57,14 +59,14 @@ export default {
         // Attach event listeners to stream dom to watch external changes
         audioEl.addEventListener("play", () => {
             this.loading = true;
-            this.$emit("play", true);
+            this.play = true;
         });
         audioEl.addEventListener("pause", () => {
             this.loading = false;
-            this.$emit("play", false);
+            this.play = false;
         });
         audioEl.addEventListener("volumechange", () => {
-            this.$emit("volumechange");
+            this.volume = this.$refs.audioEl.volume;
         });
         // Audio stream has sufficiently buffered and starts playing
         audioEl.addEventListener("playing", () => {
@@ -107,6 +109,11 @@ export default {
             sources[sources.length - 1].addEventListener("error", this.errorHandler);
         },
 
+        /**
+         * Called on error events of the audio element, emits error event with human readable message for parent
+         * @param {Event} event - Event emitted by audio element
+         * @returns {undefined}
+         */
         errorHandler(event) {
             let message = "Unknown Error";
 
