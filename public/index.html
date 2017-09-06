@@ -25,7 +25,7 @@
     <!-- Initial css to prevent flickering -->
     <style>
         [v-cloak] {
-            display: none; /* TODO: Check if display:none could cause issues, alternatively visibility: hidden*/
+            display: none;
         }
 
         body {
@@ -148,13 +148,13 @@
             v-on:playing="notify(`Now playing ${stream.currentStation.title}`, 2000)"
     ></stream-player>
     <transition name="vf">
-        <audio-visualizer v-if="visualizer.enabled && visualizer.supported && stream.play"
-                          id="visualizer"
-                          design="square"
-                          barcolor="#E91E63"
-                          :audio-context="$refs.player.audioContext"
-                          :media-el-src="$refs.player.mediaElSrc"
-        ></audio-visualizer>
+        <visualizer v-if="visualizer.enabled && visualizer.supported && $refs.player && $refs.player.play"
+                    id="visualizer"
+                    design="square"
+                    barcolor="#E91E63"
+                    :audio-context="$refs.player.audioContext"
+                    :media-el-src="$refs.player.mediaElSrc"
+        ></visualizer>
     </transition>
     <md-progress id="volumeBar" v-if="$refs.player" class="md-accent" :md-progress="$refs.player.volume*100"
                  :md-indeterminate="$refs.player.loading">

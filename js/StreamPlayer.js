@@ -86,8 +86,7 @@ export default {
         if (AudioContext) {
             try {
                 this.audioContext = new AudioContext(); // Create audio context for visualizer
-                log.debug("this.$refs.audioEl", this.$refs.audioEl, this.$refs.audioEl.attributes);
-                this.mediaElSrc = this.audioContext.createMediaElementSource(this.$refs.audioEL); // for visualizer
+                this.mediaElSrc = this.audioContext.createMediaElementSource(this.$refs.audioEl); // for visualizer
                 this.mediaElSrc.connect(this.audioContext.destination); // connect so we have audio
             }
             catch(error) {

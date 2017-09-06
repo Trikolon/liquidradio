@@ -131,7 +131,6 @@ const app = new Vue({
             }
         }
 
-        //FIXME: switchStation before mount could cause issues, only put station in currentStation object, do not fiddle with audio dom
         //Set initial station according to url parameter or liquid_radio as fallback
         //This has to be done after data init but before dom-bind.
         if (this.$route.path === "/") {
