@@ -48,6 +48,7 @@ const app = new Vue({
             enabled: JSON.parse(localStorage ? localStorage.getItem("visualizer") || "true" : "true"),
             supported: true
         },
+        shareSupported: navigator.hasOwnProperty("share"),
         socialLinks: [
             {
                 name: "Facebook",
@@ -264,7 +265,7 @@ const app = new Vue({
                     .catch(error => log.error("Error while sharing", error));
             }
             else {
-                log.debug("Sharing not supported by browser");
+                log.error("Share dialog not supported by browser");
             }
         }
     }
