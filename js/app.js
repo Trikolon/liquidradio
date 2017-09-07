@@ -171,6 +171,19 @@ const app = new Vue({
     },
     methods: {
         /**
+         * Expands or collapses station list depending on state
+         * @param {Boolean} state - Expand if true, else collapse
+         * @returns {undefined}
+         */
+        openStationList(state) {
+            log.debug(this.$refs);
+            if(!this.$refs.stationList.mdExpandMultiple) {
+                this.$refs.stationList.resetSiblings();
+            }
+            this.$refs.stationList.calculatePadding();
+            this.$refs.stationList.active = state;
+        },
+        /**
          * Switches to a different station in stream object and changes play state to true.
          * No action if station id is invalid
          * @param {String} id - Identifier of station to switch to.
@@ -220,7 +233,10 @@ const app = new Vue({
                 //NETWORK_NO_SOURCE
                 if (networkState === 3) {
                     msg = "Station offline";
-                    trigger = {text: "Switch Station", func: this.$refs.nav.open};
+                    trigger = {text: "Switch Station", func: () => {
+                        this.openStationList(true);
+                        this.$refs.nav.open();
+                    }};
                 }
             }
             // Error from audio tag
