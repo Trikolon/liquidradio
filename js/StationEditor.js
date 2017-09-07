@@ -1,4 +1,4 @@
-import Util from "./Util"
+import StationList from "./StationList"
 
 export default {
     template: "<div><md-dialog ref='dialog' v-on:close='validationError=undefined'>" +
@@ -46,7 +46,7 @@ export default {
     props: {
         stations: {
             default: [],
-            type: Array
+            type: StationList
         }
     },
     data() {
@@ -70,11 +70,11 @@ export default {
          */
         open(id) {
             if (id) {
-                const stationIndex = Util.getStationIndex(this.stations, id);
-                if (stationIndex === -1) {
+                const s = this.stations.getStation(id);
+                if (s === null) {
                     throw new Error("StationEditor: Open called with invalid station id");
                 }
-                const station = this.stations[stationIndex].clone();
+                const station = s.clone();
                 // this.selectedStation = station.clone();
                 this.selectedStation = {
                     id: station.id,
@@ -115,7 +115,7 @@ export default {
 
             // Attempt to add it to stations array
             try {
-                Util.addStation(this.stations, this.selectedStation.id, this.selectedStation.title,
+                this.stations.addStation(this.selectedStation.id, this.selectedStation.title,
                     this.selectedStation.description, this.selectedStation.source);
             }
             catch (error) {
@@ -135,11 +135,11 @@ export default {
             // Reset error field
             this.validationError = undefined;
             try {
-                const stationIndex = Util.getStationIndex(this.stations, this.selectedStation.id);
-                if (stationIndex === -1) {
+                const station = this.stations.getStation(this.selectedStation);
+                if (station === null) {
                     log.error("Attempted to save station data but could not find station in array by id");
                 }
-                const dst = this.stations[stationIndex];
+                const dst = station;
                 const src = this.selectedStation;
                 dst.id = src.id;
                 dst.title = src.title;
@@ -158,10 +158,12 @@ export default {
          * @returns {undefined}
          */
         deleteHandler() {
-            const index = Util.getStationIndex(this.stations, this.selectedStation.id);
-            if (index !== -1) {
-                this.stations.splice(index, 1);
+            try {
+                this.stations.removeStation(this.selectedStation);
                 this.$refs.dialog.close();
+            }
+            catch(error) {
+                log.error("Error while removing station", error);
             }
         },
     }

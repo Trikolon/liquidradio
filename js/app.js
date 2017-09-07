@@ -4,8 +4,7 @@ import VueRouter from "vue-router";
 import VueMaterial from "vue-material";
 import 'vue-material/dist/vue-material.css'
 import "../css/app.css";
-import Util from "./Util"
-import Station from "./Station"
+import StationList from "./StationList"
 
 import StreamPlayer from "./StreamPlayer"
 import Visualizer from "./Visualizer.js";
@@ -33,7 +32,7 @@ const app = new Vue({
         version: "1.2.0",
         stream: {
             currentStation: undefined,
-            stations: []
+            stationList: new StationList()
         },
         player: {
             offline: false,
@@ -72,13 +71,14 @@ const app = new Vue({
                 this.switchStation(to.path.substring(1));
             }
             catch (e) {
-                router.push(this.stream.stations[0].id);
+                router.push(this.stream.stationList.arr[0].id);
             }
         },
-        "stream.stations": {
+        "stream.stationList.arr": {
             handler() {
                 //Whenever stations array changes save it to local browser storage
-                if (localStorage) localStorage.setItem("stations", JSON.stringify(this.stream.stations));
+                // if (localStorage) localStorage.setItem("stations", JSON.stringify(this.stream.stationList.arr));
+                this.stream.stationList.save();
             },
             deep: true
         },
@@ -94,15 +94,15 @@ const app = new Vue({
         log.debug("Application BEFORE MOUNT", this);
 
         // Load station config from local storage and add them to stations array
-        this.addLocalStations();
+        this.stream.stationList.load();
 
         // Add / refresh stations from server
-        this.addRemoteStations(true);
+        this.stream.stationList.addStations(stations, true);
 
         //Set initial station according to url parameter or liquid_radio as fallback
         //This has to be done after data init but before dom-bind.
         if (this.$route.path === "/") {
-            this.switchStation(this.stream.stations[0].id, false);
+            this.switchStation(this.stream.stationList.arr[0].id, false);
         }
         else {
             try {
@@ -110,8 +110,8 @@ const app = new Vue({
             }
             catch (e) {
                 log.debug(`Route url ${this.$route.path} doesn't contain valid station id, fallback to default.`);
-                this.switchStation(this.stream.stations[0].id, false);
-                router.push(this.stream.stations[0].id);
+                this.switchStation(this.stream.stationList.arr[0].id, false);
+                router.push(this.stream.stationList.arr[0].id);
             }
         }
     },
@@ -179,11 +179,11 @@ const app = new Vue({
         switchStation(id, play = true) {
             if (this.stream.currentStation && id === this.stream.currentStation.id) return;
 
-            const index = Util.getStationIndex(this.stream.stations, id);
-            if (index === -1) {
+            const station = this.stream.stationList.getStation(id);
+            if (station === null) {
                 throw new Error(`Attempted to switch to station with invalid station id ${id}`);
             }
-            this.stream.currentStation = this.stream.stations[index];
+            this.stream.currentStation = station;
 
             // Wait for vue to update src url in audio element before triggering play()
             Vue.nextTick(() => {
@@ -196,64 +196,8 @@ const app = new Vue({
          * @returns {undefined}
          */
         resetStations() {
-            this.stream.stations = [];
-            this.addRemoteStations();
-        },
-        /**
-         * Adds stations from remote to station array
-         * @param {Boolean} overwrite - If true, overwrite existing stations with duplicate id.
-         * @returns {undefined}
-         */
-        addRemoteStations(overwrite = false) {
-            const failedStations = [];
-            stations.forEach((station) => {
-                try {
-                    Util.addStation(this.stream.stations, station.id, station.title, station.description, station.source, overwrite);
-                }
-                catch (e) {
-                    log.debug(e);
-                    failedStations.push(station);
-                }
-            });
-            if (failedStations.length > 0) {
-                log.error("Some stations failed to parse / add", failedStations);
-            }
-        },
-        /**
-         * Adds stations from local storage to station array
-         * @param {Boolean} overwrite - If true, overwrite existing stations with duplicate id.
-         * @returns {undefined}
-         */
-        addLocalStations(overwrite = false) {
-            if (localStorage) {
-                let storedStations = localStorage.getItem("stations");
-
-                if (storedStations) {
-                    let failed = false;
-                    try {
-                        storedStations = JSON.parse(storedStations);
-                    }
-                    catch (e) {
-                        log.error("Could not parse station config from local storage");
-                        localStorage.removeItem("stations"); // localStorage contains invalid data, lets remove it
-                        failed = true;
-                    }
-
-                    // This might not be the best performing way, but it ensures the format is correct. localStorage could
-                    // contain invalid data; Also it prevents duplicates and default stations from being overwritten
-                    if (!failed) {
-                        log.debug("Loaded stations object from localstorage", storedStations);
-                        storedStations.forEach((station) => {
-                            try {
-                                Util.addStationObject(this.stream.stations, Station.fromJSON(station), overwrite);
-                            }
-                            catch (e) {
-                                log.debug("addStation() for local storage station failed", e);
-                            }
-                        });
-                    }
-                }
-            }
+            this.stream.stationList.arr = [];
+            this.stream.stationList.addStations(stations);
         },
         /**
          * Helper method triggered by station switch from dom (navigation)
