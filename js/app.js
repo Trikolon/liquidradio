@@ -77,7 +77,6 @@ const app = new Vue({
         "stream.stationList.arr": {
             handler() {
                 //Whenever stations array changes save it to local browser storage
-                // if (localStorage) localStorage.setItem("stations", JSON.stringify(this.stream.stationList.arr));
                 this.stream.stationList.save();
             },
             deep: true
@@ -196,7 +195,7 @@ const app = new Vue({
          * @returns {undefined}
          */
         resetStations() {
-            this.stream.stationList.arr = [];
+            this.stream.stationList.clear();
             this.stream.stationList.addStations(stations);
         },
         /**

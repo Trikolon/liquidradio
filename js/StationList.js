@@ -2,10 +2,6 @@ import Station from "./Station"
 
 export default class StationList {
     constructor(stations = []) {
-        this.stations = stations;
-    }
-
-    set stations(stations) {
         if (!Array.isArray(stations)) {
             throw new Error("Argument 'stations' must be an array");
         }
@@ -19,11 +15,6 @@ export default class StationList {
     get arr() {
         return this.stations;
     }
-
-    set arr(stations) {
-        this.stations = stations;
-    }
-
 
     /**
      * Adds station to station array. Validates station arguments.
@@ -151,6 +142,10 @@ export default class StationList {
         if (failedStations.length > 0) {
             log.error("Some stations failed to parse / add", failedStations);
         }
+    }
+
+    clear() {
+        this._stations = [];
     }
 
     /**

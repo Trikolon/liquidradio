@@ -75,7 +75,6 @@ export default {
                     throw new Error("StationEditor: Open called with invalid station id");
                 }
                 const station = s.clone();
-                // this.selectedStation = station.clone();
                 this.selectedStation = {
                     id: station.id,
                     title: station.title,
@@ -159,11 +158,12 @@ export default {
          */
         deleteHandler() {
             try {
-                this.stations.removeStation(this.selectedStation);
+                // Station removed via id because selectedStation isn't a proper Station object (validation constraints)
+                this.stations.removeStation(this.selectedStation.id);
                 this.$refs.dialog.close();
             }
             catch(error) {
-                log.error("Error while removing station", error);
+                log.error("Error while removing station", error, this.selectedStation);
             }
         },
     }
