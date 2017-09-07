@@ -69,7 +69,6 @@
                     <md-list>
                         <div v-if="stationEditMode">
                             <md-list-item class="md-inset" v-for="station in stream.stations" :key="station.id"
-                                          id="station.id"
                                           v-on:click="$refs.stationEditor.open(station.id)">
                                 <span>{{station.title}}</span>
                                 <md-icon>reorder</md-icon>
@@ -80,7 +79,6 @@
                         </div>
                         <md-list-item v-if="!stationEditMode" class="md-inset" v-for="station in stream.stations"
                                       :key="station.id"
-                                      id="station.id"
                                       v-on:click="updateRoute(station.id); $refs.nav.toggle()">
                             <span>{{station.title}}</span>
                         </md-list-item>
@@ -146,8 +144,7 @@
             ref="player"
             :station="stream.currentStation"
             v-on:error="streamError"
-            v-on:stalled="this.notify('Stream stalled, check your connection.');"
-            v-on:playing="notify(`Now playing ${stream.currentStation.title}`, 2000)"
+            v-on:playing="notify(`Now playing: ${stream.currentStation.title}`, 2000)"
     ></stream-player>
     <transition name="vf">
         <visualizer v-if="visualizer.enabled && visualizer.supported && $refs.player && $refs.player.play"
