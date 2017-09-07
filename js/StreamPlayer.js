@@ -31,22 +31,23 @@ export default {
                 this.loading = false;
             }
             this.updatePlayState(state);
-            this.$emit("play", state);
+            this.$emit("state-change", "play", state);
         },
         "offline"(state) {
             if (state) {
                 log.debug("Stream went offline");
                 this.play = false;
             }
+            this.$emit("state-change", "offline", state);
         },
-        "volume"() {
-            this.$refs.audioEl.volume = this.volume;
+        "loading"(state) {
+            this.$emit("state-change", "loading", state);
+        },
+        "volume"(state) {
+            this.$refs.audioEl.volume = state;
             // Save volume setting to config
-            if (localStorage) localStorage.setItem("volume", this.volume);
-            this.$emit("volumechange");
-        },
-        "$refs.audioEl.networkState"(state) {
-            log.debug("Network state changed", state);
+            if (localStorage) localStorage.setItem("volume", state);
+            this.$emit("state-change", "volume", state);
         }
     },
     beforeDestroy() {
@@ -71,13 +72,11 @@ export default {
         // Audio stream has sufficiently buffered and starts playing
         audioEl.addEventListener("playing", () => {
             this.loading = false;
-            this.$emit("playing");
         });
 
         // Attach error handlers
         audioEl.addEventListener("error", this.errorHandler);
         audioEl.addEventListener("stalled", this.errorHandler);
-
 
         // Source tag special case
         this.attachSourceErrorHandler();
@@ -98,6 +97,12 @@ export default {
         // Set initial volume of audio element
         this.$refs.audioEl.volume = this.volume;
 
+
+        // Send events for initial state
+        this.$emit("state-change", "play", this.play);
+        this.$emit("state-change", "offline", this.offline);
+        this.$emit("state-change", "loading", this.loading);
+        this.$emit("state-change", "volume", this.volume);
     },
     methods: {
         /**
@@ -154,14 +159,13 @@ export default {
          * @returns {undefined}
          */
         updatePlayState(state) {
-            log.debug("play state changed to", state);
             if (state) {
                 this.$refs.audioEl.play();
-                log.debug("started stream");
+                log.debug("Started playback");
             }
             else {
                 this.$refs.audioEl.pause();
-                log.debug("stopped stream");
+                log.debug("Stopped playback");
             }
         }
         ,
