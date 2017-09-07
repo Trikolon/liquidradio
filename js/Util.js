@@ -8,34 +8,43 @@ const util = {
      * @param {String} title - Display title (human readable).
      * @param {String} description - Description of station to be shown when selected.
      * @param {Array} source - Objects with src = url of audio stream and type to be injected into audio element.
+     * @param {Boolean} overwrite - Overwrite if duplicate
      * @throws {Error} if arguments are invalid or station already existing.
      * @returns {undefined}
      */
-    addStation(stations, id, title, description = "", source) {
-        this.addStationObject(stations, new Station(id, title, description, source));
+    addStation(stations, id, title, description = "", source, overwrite = false) {
+        this.addStationObject(stations, new Station(id, title, description, source), overwrite);
     },
 
     /**
      * Adds station object to station array.
      * @param {Array} stations - Array to add station to.
      * @param {Station} station - Station object to add to stations array.
+     * @param {Boolean} overwrite - Overwrite if duplicate
      * @returns {undefined}
      */
-    addStationObject(stations, station) {
+    addStationObject(stations, station, overwrite = false) {
         // Test if arguments are defined and of the correct type
-        if(!stations || !Array.isArray(stations)) {
+        if (!stations || !Array.isArray(stations)) {
             throw new Error("Invalid or missing stations array");
         }
-        if(!station || !station instanceof Station) {
+        if (!station || !station instanceof Station) {
             throw new Error("Invalid or missing station object");
         }
 
-        // Test if station already existing in array
-        if (this.getStationIndex(stations, station.id) !== -1) {
-            throw new Error(`Station with id ${station.id} already existing!`);
+        const stationIndex = this.getStationIndex(stations, station.id);
+        if (stationIndex !== -1) {
+            if (overwrite) {
+                stations[stationIndex] = station;
+                log.debug(`Station ${station.id} already existing => Replacing`);
+            }
+            else {
+                throw new Error(`Station with id ${station.id} already existing!`);
+            }
         }
-
-        stations.push(station);
+        else {
+            stations.push(station);
+        }
     },
 
 
