@@ -76,13 +76,13 @@
                                 <md-icon>restore</md-icon>
                                 <span>Reset Stations</span>
                             </md-list-item>
-                            <md-list-item class="md-inset" v-for="station in stream.stations" :key="station.id"
+                            <md-list-item class="md-inset" v-for="station in stream.stationList.arr" :key="station.id"
                                           v-on:click="$refs.stationEditor.open(station.id)">
                                 <span>{{station.title}}</span>
                                 <md-icon>reorder</md-icon>
                             </md-list-item>
                         </div>
-                        <md-list-item v-if="!stationEditMode" class="md-inset" v-for="station in stream.stations"
+                        <md-list-item v-if="!stationEditMode" class="md-inset" v-for="station in stream.stationList.arr"
                                       :key="station.id"
                                       v-on:click="updateRoute(station.id); $refs.nav.toggle()">
                             <span>{{station.title}}</span>
@@ -144,7 +144,7 @@
             <md-tooltip md-delay="400" md-direction="top">Reload</md-tooltip>
         </md-button>
     </div>
-    <station-editor ref="stationEditor" :stations="stream.stations"></station-editor>
+    <station-editor ref="stationEditor" :stations="stream.stationList"></station-editor>
     <stream-player
             ref="player"
             :station="stream.currentStation"
