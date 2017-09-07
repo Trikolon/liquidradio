@@ -68,13 +68,18 @@
                 <md-list-expand>
                     <md-list>
                         <div v-if="stationEditMode">
+                            <md-list-item class="md-inset" v-on:click="$refs.stationEditor.open()">
+                                <md-icon>add_circle_outline</md-icon>
+                                <span>Add Station</span>
+                            </md-list-item>
+                            <md-list-item class="md-inset" v-on:click="resetStations()">
+                                <md-icon>restore</md-icon>
+                                <span>Reset Stations</span>
+                            </md-list-item>
                             <md-list-item class="md-inset" v-for="station in stream.stations" :key="station.id"
                                           v-on:click="$refs.stationEditor.open(station.id)">
                                 <span>{{station.title}}</span>
                                 <md-icon>reorder</md-icon>
-                            </md-list-item>
-                            <md-list-item class="md-inset" v-on:click="$refs.stationEditor.open()">
-                                <md-icon>add_circle_outline</md-icon>
                             </md-list-item>
                         </div>
                         <md-list-item v-if="!stationEditMode" class="md-inset" v-for="station in stream.stations"

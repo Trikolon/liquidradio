@@ -33,7 +33,6 @@ const app = new Vue({
         version: "1.2.0",
         stream: {
             currentStation: undefined,
-            defaultStation: "liquid_radio",
             stations: []
         },
         stationEditMode: false,
@@ -67,7 +66,7 @@ const app = new Vue({
                 this.switchStation(to.path.substring(1));
             }
             catch (e) {
-                router.push(this.stream.defaultStation);
+                router.push(this.stream.stations[0].id);
             }
         },
         "stream.stations": {
@@ -87,55 +86,17 @@ const app = new Vue({
     },
     beforeMount() {
         log.debug("Application BEFORE MOUNT", this);
-        // 1. Add stations from server to local array
-        const failedStations = [];
-        stations.forEach((station) => {
-            try {
-                this.stream.stations.push(new Station(station.id, station.title, station.description, station.source));
-            }
-            catch (error) {
-                failedStations.push(station);
-            }
-        });
-        if (failedStations.length > 0) {
-            log.error("Some stations failed to parse", failedStations);
-        }
 
-        // 2. Load additional station config from local storage and add them to existing stations (duplicates will be discarded)
-        if (localStorage) {
-            let storedStations = localStorage.getItem("stations");
+        // Load station config from local storage and add them to stations array
+        this.addLocalStations();
 
-            if (storedStations) {
-                let failed = false;
-                try {
-                    storedStations = JSON.parse(storedStations);
-                }
-                catch (e) {
-                    log.error("Could not parse station config from local storage");
-                    localStorage.removeItem("stations"); // localStorage contains invalid data, lets remove it
-                    failed = true;
-                }
-
-                // This might not be the best performing way, but it ensures the format is correct. localStorage could
-                // contain invalid data; Also it prevents duplicates and default stations from being overwritten
-                if (!failed) {
-                    log.debug("Loaded stations object from localstorage", storedStations);
-                    storedStations.forEach((station) => {
-                        try {
-                            Util.addStationObject(this.stream.stations, Station.fromJSON(station));
-                        }
-                        catch (e) {
-                            log.debug("addStation() for local storage station failed", e);
-                        }
-                    });
-                }
-            }
-        }
+        // Add / refresh stations from server
+        this.addRemoteStations(true);
 
         //Set initial station according to url parameter or liquid_radio as fallback
         //This has to be done after data init but before dom-bind.
         if (this.$route.path === "/") {
-            this.switchStation(this.stream.defaultStation, false);
+            this.switchStation(this.stream.stations[0].id, false);
         }
         else {
             try {
@@ -143,8 +104,8 @@ const app = new Vue({
             }
             catch (e) {
                 log.debug(`Route url ${this.$route.path} doesn't contain valid station id, fallback to default.`);
-                this.switchStation(this.stream.defaultStation, false);
-                router.push(this.stream.defaultStation);
+                this.switchStation(this.stream.stations[0].id, false);
+                router.push(this.stream.stations[0].id);
             }
         }
     },
@@ -161,11 +122,18 @@ const app = new Vue({
 
         // // Bind hotkey events
         window.onkeydown = (e) => {
-            if (this.$refs.player && e.keyCode === 32 && document.activeElement.tagName.toLowerCase() !== "input") { // Spacebar toggles play state
-                if (this.$refs.player.offline === false) {
-                    this.$refs.player.play = !this.$refs.player.play;
-                    e.preventDefault();
+            if (this.$refs.player && e.keyCode === 32) { // Spacebar toggles play state
+
+                const tagName = document.activeElement.tagName.toLowerCase();
+                if (tagName === "input" || tagName === "textarea") {
+                    return;
                 }
+                if (this.$refs.player.offline) {
+                    return;
+                }
+
+                this.$refs.player.play = !this.$refs.player.play;
+                e.preventDefault();
             }
         };
     },
@@ -176,7 +144,6 @@ const app = new Vue({
          * @returns {undefined}
          */
         openStationList(state) {
-            log.debug(this.$refs);
             if (!this.$refs.stationList.mdExpandMultiple) {
                 this.$refs.stationList.resetSiblings();
             }
@@ -205,6 +172,70 @@ const app = new Vue({
                 this.$refs.player.reload(play);
             });
             log.debug("Switched station to", this.stream.currentStation.title, this.stream.currentStation);
+        },
+        /**
+         * Resets station array and adds default stations from remote
+         * @returns {undefined}
+         */
+        resetStations() {
+            this.stream.stations = [];
+            this.addRemoteStations();
+        },
+        /**
+         * Adds stations from remote to station array
+         * @param {Boolean} overwrite - If true, overwrite existing stations with duplicate id.
+         * @returns {undefined}
+         */
+        addRemoteStations(overwrite = false) {
+            const failedStations = [];
+            stations.forEach((station) => {
+                try {
+                    Util.addStation(this.stream.stations, station.id, station.title, station.description, station.source, overwrite);
+                }
+                catch (e) {
+                    log.debug(e);
+                    failedStations.push(station);
+                }
+            });
+            if (failedStations.length > 0) {
+                log.error("Some stations failed to parse / add", failedStations);
+            }
+        },
+        /**
+         * Adds stations from local storage to station array
+         * @param {Boolean} overwrite - If true, overwrite existing stations with duplicate id.
+         * @returns {undefined}
+         */
+        addLocalStations(overwrite = false) {
+            if (localStorage) {
+                let storedStations = localStorage.getItem("stations");
+
+                if (storedStations) {
+                    let failed = false;
+                    try {
+                        storedStations = JSON.parse(storedStations);
+                    }
+                    catch (e) {
+                        log.error("Could not parse station config from local storage");
+                        localStorage.removeItem("stations"); // localStorage contains invalid data, lets remove it
+                        failed = true;
+                    }
+
+                    // This might not be the best performing way, but it ensures the format is correct. localStorage could
+                    // contain invalid data; Also it prevents duplicates and default stations from being overwritten
+                    if (!failed) {
+                        log.debug("Loaded stations object from localstorage", storedStations);
+                        storedStations.forEach((station) => {
+                            try {
+                                Util.addStationObject(this.stream.stations, Station.fromJSON(station), overwrite);
+                            }
+                            catch (e) {
+                                log.debug("addStation() for local storage station failed", e);
+                            }
+                        });
+                    }
+                }
+            }
         },
         /**
          * Helper method triggered by station switch from dom (navigation)
