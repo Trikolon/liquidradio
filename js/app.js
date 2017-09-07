@@ -177,7 +177,7 @@ const app = new Vue({
          */
         openStationList(state) {
             log.debug(this.$refs);
-            if(!this.$refs.stationList.mdExpandMultiple) {
+            if (!this.$refs.stationList.mdExpandMultiple) {
                 this.$refs.stationList.resetSiblings();
             }
             this.$refs.stationList.calculatePadding();
@@ -222,7 +222,12 @@ const app = new Vue({
          */
         streamError(event, message) {
             log.error("Error in stream", event, message);
-            this.notify(`Error: ${message}`, undefined, {text: "Switch Station", func: this.$refs.nav.open});
+            this.notify(`Error: ${message}`, undefined, {
+                text: "Switch Station", func: () => {
+                    this.openStationList(true);
+                    this.$refs.nav.open();
+                }
+            });
         },
         /**
          * Shows notification
