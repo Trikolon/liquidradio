@@ -83,7 +83,7 @@
                             </md-list-item>
                         </div>
                         <md-list-item v-if="!stationEditMode" class="md-inset" v-for="station in stream.stationList.arr"
-                                      :key="station.id"
+                                      :key="station.id" :disabled="station.id === stream.currentStation.id"
                                       v-on:click="updateRoute(station.id); $refs.nav.toggle()">
                             <span>{{station.title}}</span>
                         </md-list-item>
