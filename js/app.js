@@ -35,6 +35,12 @@ const app = new Vue({
             currentStation: undefined,
             stations: []
         },
+        player: {
+            offline: false,
+            loading: false,
+            play: false,
+            volume: 0
+        },
         stationEditMode: false,
         notification: {
             message: "",
@@ -138,6 +144,18 @@ const app = new Vue({
         };
     },
     methods: {
+        /**
+         * Called for player state-change events. Updates variables for gui components.
+         * @param {String} key - Name of player attribute (e.g. volume)
+         * @param {Object} state - Value of player attribute (e.g. 0.4)
+         * @returns {undefined}
+         */
+        playerStateChange(key, state) {
+            this.player[key] = state;
+            if(key === "play" && state === true){
+                this.notify(`Now playing: ${this.stream.currentStation.title}`, 2000);
+            }
+        },
         /**
          * Expands or collapses station list depending on state
          * @param {Boolean} state - Expand if true, else collapse
