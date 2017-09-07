@@ -216,52 +216,13 @@ const app = new Vue({
         },
         /**
          * Error handler audio stream.
-         * @param {Event} error - Event fired including error information.
-         * @param {Object} networkState - Additional info for stream error, maybe undefined.
+         * @param {Event} event - Event fired including error information.
+         * @param {String} message - Human readable error message.
          * @returns {undefined}
          */
-        streamError(error, networkState) {
-            log.error("Error in stream", error);
-            let msg = "Unknown Error";
-            let trigger;
-
-            // Error from source tag
-            if (error.target.nodeName === "SOURCE" && networkState) {
-                log.debug("Error originates from SOURCE tag");
-
-                log.debug("NetworkState", networkState);
-                //NETWORK_NO_SOURCE
-                if (networkState === 3) {
-                    msg = "Station offline";
-                    trigger = {text: "Switch Station", func: () => {
-                        this.openStationList(true);
-                        this.$refs.nav.open();
-                    }};
-                }
-            }
-            // Error from audio tag
-            else if (error.target.nodeName === "AUDIO") {
-                log.debug("Error originates from AUDIO tag");
-                log.error(error.target.error.code, error.target.error.message);
-                msg = "Error: ";
-
-                switch (error.target.error.code) {
-                    case error.target.error.MEDIA_ERR_ABORTED:
-                        msg += "Playback aborted by user.";
-                        break;
-                    case error.target.error.MEDIA_ERR_NETWORK:
-                        msg += "Network error. Check your connection.";
-                        break;
-                    case error.target.error.MEDIA_ERR_DECODE:
-                        msg += "Decoding error.";
-                        break;
-                    default:
-                        msg += `Unknown error code ${error.target.code}`;
-                        break;
-                }
-            }
-            this.$refs.player.offline = true;
-            this.notify(msg, undefined, trigger);
+        streamError(event, message) {
+            log.error("Error in stream", event, message);
+            this.notify(`Error: ${message}`, undefined, {text: "Switch Station", func: this.$refs.nav.open});
         },
         /**
          * Shows notification
@@ -286,7 +247,7 @@ const app = new Vue({
             if (window.navigator.share) {
                 window.navigator.share({
                     title: document.title,
-                    text: this.title,
+                    text: `Listen to ${this.stream.currentStation.title} on ${this.title}.`,
                     url: window.location.href
                 })
                     .then(() => log.debug("Shared successfully"))

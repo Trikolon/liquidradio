@@ -24,13 +24,14 @@ export default {
     },
     watch: {
         "station"() {
-            this.attachErrorHandler(); // When station changes, re-attach error handler to new error element
+            this.attachSourceErrorHandler(); // When station changes, re-attach error handler to new error element
         },
         "play"(state) {
             if (!state) {
                 this.loading = false;
             }
             this.updatePlayState(state);
+            this.$emit("play", state);
         },
         "offline"(state) {
             if (state) {
@@ -39,8 +40,13 @@ export default {
             }
         },
         "volume"() {
+            this.$refs.audioEl.volume = this.volume;
             // Save volume setting to config
             if (localStorage) localStorage.setItem("volume", this.volume);
+            this.$emit("volumechange");
+        },
+        "$refs.audioEl.networkState"(state) {
+            log.debug("Network state changed", state);
         }
     },
     beforeDestroy() {
@@ -49,36 +55,32 @@ export default {
     mounted() {
         log.debug("StreamPlayer MOUNTED", this);
         const audioEl = this.$refs.audioEl;
+
         // Attach event listeners to stream dom to watch external changes
         audioEl.addEventListener("play", () => {
             this.loading = true;
-            this.$emit("play", true);
+            this.play = true;
         });
         audioEl.addEventListener("pause", () => {
             this.loading = false;
-            this.$emit("play", false);
+            this.play = false;
         });
         audioEl.addEventListener("volumechange", () => {
-            this.$emit("volumechange");
+            this.volume = this.$refs.audioEl.volume;
         });
-
-        //TODO: Integrate this into error event
-        audioEl.addEventListener("stalled", (error) => {
-            // this.$emit("stalled", error);
-            this.$emit("error", error);
-        });
-
         // Audio stream has sufficiently buffered and starts playing
         audioEl.addEventListener("playing", () => {
             this.loading = false;
             this.$emit("playing");
         });
-        audioEl.addEventListener("error", (error) => {
-            this.$emit("error", error);
-        });
+
+        // Attach error handlers
+        audioEl.addEventListener("error", this.errorHandler);
+        audioEl.addEventListener("stalled", this.errorHandler);
+
 
         // Source tag special case
-        this.attachErrorHandler();
+        this.attachSourceErrorHandler();
 
         // Audio API
         // Check if AudioContext is supported by browser
@@ -89,7 +91,7 @@ export default {
                 this.mediaElSrc = this.audioContext.createMediaElementSource(this.$refs.audioEl); // for visualizer
                 this.mediaElSrc.connect(this.audioContext.destination); // connect so we have audio
             }
-            catch(error) {
+            catch (error) {
                 log.error("StreamPlayer: Error while setting up AudioAPI", error);
             }
         }
@@ -102,12 +104,49 @@ export default {
          * Attaches Listener to last source tag in html audio element and emits error event on error from el
          * @returns {undefined}
          */
-        attachErrorHandler() {
+        attachSourceErrorHandler() {
             const sources = Array.from(this.$refs.audioEl.getElementsByTagName("source"));
-            sources[sources.length - 1].addEventListener("error", (error) => {
-                log.debug("networkState property access", this.$refs.audioEl, this.$refs);
-                this.$emit("error", error, this.$refs.audioEl.networkState);
-            });
+            sources[sources.length - 1].addEventListener("error", this.errorHandler);
+        },
+
+        /**
+         * Called on error events of the audio element, emits error event with human readable message for parent
+         * @param {Event} event - Event emitted by audio element
+         * @returns {undefined}
+         */
+        errorHandler(event) {
+            let message = "Unknown Error";
+
+            const networkState = this.$refs.audioEl.networkState;
+            // Check Network State
+            if (networkState === 3) {
+                message = "Stream offline";
+                this.offline = true;
+            }
+            // Check stalled property
+            else if (event.type === "stalled") {
+                message = "Network stalled"
+            }
+            // Check error codes
+            else if (event.target.error && event.target.error.code) {
+                switch (event.target.error.code) {
+                    case event.target.error.MEDIA_ERR_ABORTED:
+                        message = "Playback aborted by user.";
+                        break;
+                    case event.target.error.MEDIA_ERR_NETWORK:
+                        message = "Network error. Check your connection.";
+                        break;
+                    case event.target.error.MEDIA_ERR_DECODE:
+                        message = "Decoding error.";
+                        break;
+                    default:
+                        message = `Unknown error code ${event.target.code}`;
+                        break;
+                }
+                this.offline = true;
+            }
+            // Emit event containing event info and human readable error
+            this.$emit("error", event, message);
         },
         /**
          * Trigger play or pause for audio el depending on state.
@@ -124,7 +163,8 @@ export default {
                 this.$refs.audioEl.pause();
                 log.debug("stopped stream");
             }
-        },
+        }
+        ,
         /**
          * Reloads audio element to catch up in stream.
          * @param {Boolean} play - Flag whether play should be triggered after audio el reload
@@ -144,7 +184,8 @@ export default {
             }
 
             this.offline = false;
-        },
+        }
+        ,
         /**
          * Modify stream volume by modifier value. Bounds of volume are 0 - 1
          * @param {Number} value - Positive or negative number that will be added.
@@ -163,6 +204,7 @@ export default {
                 this.volume = Math.round((this.volume + value) * 10) / 10;
                 log.debug(`Modified volume by ${value} to ${this.volume}`);
             }
-        },
+        }
+        ,
     }
 }

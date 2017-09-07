@@ -103,12 +103,7 @@ export default {
 
             this.c.strokeStyle = this.barcolor; // material design primary
 
-            log.debug("fftSize:           ", this.analyser.fftSize);
-            log.debug("freqBytes length:  ", this.freqBytes.length);
-            log.debug("upperbound:        ", this.upperbound);
-
-            log.debug("offset:            ", this.offset);
-            log.debug("cBarWith:          ", this.cBarWith);
+            log.debug(`fftSize: ${this.analyser.fftSize}; freqBytes length: ${this.freqBytes.length}; upperbound: ${this.upperbound}; offset: ${this.offset}; cBarWith: ${this.cBarWith}`);
         },
 
         /**
@@ -117,7 +112,7 @@ export default {
          * @returns {undefined}
          */
         resize() {
-            log.debug("resize event triggered");
+            log.debug("Resize event triggered");
             // Lookup the size the browser is displaying the canvas.
             const displayWidth = this.canvas.clientWidth;
             const displayHeight = this.canvas.clientHeight;
