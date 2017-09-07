@@ -57,10 +57,12 @@
         </md-toolbar>
         <md-list>
             <!-- Station list -->
-            <md-list-item class="md-primary">
+            <md-list-item ref="stationList" class="md-primary">
                 <md-icon>music_note</md-icon>
                 <span>Stations</span>
-                <md-button class="md-icon-button" v-on:click="stationEditMode = !stationEditMode">
+                <md-button class="md-icon-button"
+                           v-on:click="stationEditMode = !stationEditMode;
+                            stationEditMode ? openStationList(true) : undefined">
                     <md-icon>{{stationEditMode ? "done" : "mode_edit"}}</md-icon>
                 </md-button>
                 <md-list-expand>
