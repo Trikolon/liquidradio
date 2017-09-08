@@ -59,21 +59,29 @@ export default class StationList {
 
     /**
      * Get station index by id
-     * @param {String} id - Id to query station array for.
+     * @param {String|Station} station - Id to query station array for.
      * @returns {number} - Index of station in array or -1 if not found.
      */
-    getStationIndex(id) {
-        if (id && typeof id === "string") {
-            for (let i = 0; i < this.stations.length; i++) {
-                if (this.stations[i].id === id) {
-                    return i;
+    getStationIndex(station) {
+        if (station instanceof Station) {
+            return this.stations.indexOf(station);
+        }
+        else if (typeof station === "string") {
+            if (station && typeof station === "string") {
+                for (let i = 0; i < this.stations.length; i++) {
+                    if (this.stations[i].id === station) {
+                        return i;
+                    }
                 }
+                return -1;
             }
-            return -1;
+            else {
+                log.debug(arguments);
+                throw new Error("Invalid arguments");
+            }
         }
         else {
-            log.debug(arguments);
-            throw new Error("Invalid arguments");
+            throw new Error("Invalid argument 'station'. Must either be string (station-id) or Station object");
         }
     }
 
@@ -193,7 +201,7 @@ export default class StationList {
                     }
 
                     // Add to stations array
-                    this.addStations(storedStations);
+                    this.addStations(storedStations, overwrite);
                 }
             }
         }
