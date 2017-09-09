@@ -9,6 +9,7 @@ import StationList from "./StationList"
 import StreamPlayer from "./StreamPlayer"
 import Visualizer from "./Visualizer.js";
 import StationEditor from "./StationEditor.js"
+import NetworkStatus from "./NetworkStatus"
 
 window.log = loglevel.getLogger("liquidradio"); // Get a custom logger to prevent webpack-dev-server from controlling it
 log.setDefaultLevel(process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG");
@@ -18,6 +19,7 @@ log.debug("%cDebug messages enabled", "background: red; color: yellow; font-size
 Vue.component("StreamPlayer", StreamPlayer);
 Vue.component("StationEditor", StationEditor);
 Vue.component("Visualizer", Visualizer);
+Vue.component("NetworkStatus", NetworkStatus);
 Vue.use(VueMaterial);
 Vue.use(VueRouter);
 
