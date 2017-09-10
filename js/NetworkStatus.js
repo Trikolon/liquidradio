@@ -31,7 +31,12 @@ export default {
     },
     methods: {
         isVisible() {
-            return status && this.onlineIcon !== "" || !status && this.offlineIcon !== "";
+            if (status) {
+                return this.onlineIcon !== "";
+            }
+            else {
+                return this.offlineIcon !== "";
+            }
         },
         statusHandler(status) {
             this.status = status;
