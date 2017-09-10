@@ -39,11 +39,11 @@
 <script>document.getElementById("nojswarn").style.display = "none"</script>
 <div id="app" class="phone-viewport" v-cloak>
     <md-whiteframe md-tag="md-toolbar" md-elevation="2" class="md-small">
-            <md-button class="md-icon-button" v-on:click="$refs.nav.toggle()">
-                <md-icon>menu</md-icon>
-            </md-button>
-            <h2 class="md-title" style="flex: 1">{{title}}</h2>
-            <network-status></network-status>
+        <md-button class="md-icon-button" v-on:click="$refs.nav.toggle()">
+            <md-icon>menu</md-icon>
+        </md-button>
+        <h2 class="md-title" style="flex: 1">{{title}}</h2>
+        <network-status online-icon="" tooltip="Network Offline"></network-status>
     </md-whiteframe>
     <md-sidenav class="md-left" ref="nav" v-on:close="stationEditMode = false">
         <md-toolbar class="md-small">

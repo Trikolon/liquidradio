@@ -1,9 +1,20 @@
 export default {
     template:
-    "<div>" +
-    "    <md-tooltip md-direction='left'>Network Status</md-tooltip>" +
-    "    <md-icon>{{status ? 'cloud_queue' : 'cloud_off'}}</md-icon>" +
+    "<div v-if='isVisible()'>" +
+    "    <md-tooltip md-direction='left'>{{this.tooltip}}</md-tooltip>" +
+    "    <md-icon>{{status ? this.onlineIcon : this.offlineIcon}}</md-icon>" +
     "</div>",
+    props: {
+        onlineIcon: {
+            default: "cloud_queue"
+        },
+        offlineIcon: {
+            default: "cloud_off"
+        },
+        tooltip: {
+            default: "Network Status"
+        }
+    },
     data() {
         return {
             status: navigator.onLine
@@ -15,10 +26,13 @@ export default {
     mounted() {
         log.debug("NetworkStatus MOUNTED", this);
 
-        window.addEventListener('online',  () => this.statusHandler(true));
+        window.addEventListener('online', () => this.statusHandler(true));
         window.addEventListener('offline', () => this.statusHandler(false));
     },
     methods: {
+        isVisible() {
+            return status && this.onlineIcon !== "" || !status && this.offlineIcon !== "";
+        },
         statusHandler(status) {
             this.status = status;
             this.$emit("status-change", status);
