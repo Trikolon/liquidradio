@@ -10,6 +10,14 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.vue$/,
+                loader: 'vue-loader',
+                options: {
+                    loaders: {
+                    }
+                }
+            },
+            {
                 test: /\.css$/,
                 use: ['style-loader', 'css-loader']
             }
@@ -26,5 +34,4 @@ module.exports = {
             vue$: "vue/dist/vue.esm.js"
         }
     }
-
 };
