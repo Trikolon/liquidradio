@@ -1,15 +1,16 @@
-import * as loglevel from "loglevel";
-import Vue from "vue";
-import VueRouter from "vue-router";
-import VueMaterial from "vue-material";
+import * as loglevel from "loglevel"
+import Vue from "vue"
+import VueRouter from "vue-router"
+import VueMaterial from "vue-material"
 import 'vue-material/dist/vue-material.css'
-import "../css/app.css";
+
+import "../css/app.css"
 import StationList from "./StationList"
 
-import StreamPlayer from "./StreamPlayer"
-import Visualizer from "./Visualizer.js";
-import StationEditor from "./StationEditor.js"
-import NetworkStatus from "./NetworkStatus"
+import StreamPlayer from "./components/StreamPlayer.vue"
+import Visualizer from "./components/Visualizer.vue"
+import StationEditor from "./components/StationEditor.vue"
+import NetworkStatus from "./components/NetworkStatus.vue"
 
 window.log = loglevel.getLogger("liquidradio"); // Get a custom logger to prevent webpack-dev-server from controlling it
 log.setDefaultLevel(process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG");
