@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const BabiliPlugin = require("babili-webpack-plugin");
 
 module.exports = {
-    entry: './src/app.js',
+    entry: './src/index.js',
     output: {
         path: path.resolve("./public/", 'dist'),
         publicPath: "/dist/",

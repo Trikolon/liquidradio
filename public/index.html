@@ -28,146 +28,26 @@
             display: none;
         }
 
+        #nojswarn {
+            text-align: center;
+            color: white;
+            background-color: black;
+        }
+
         body {
+            font-family: "Roboto", sans-serif;
+            color: white;
+            overflow: hidden;
             background-color: #3a4145;
         }
     </style>
 </head>
 <body>
-<h1 id="nojswarn" style="text-align: center; color: white; background-color: black;">Liquidradio.pro requires Javascript
+<h1 id="nojswarn">Liquidradio.pro requires Javascript
     in order to function. Please enable it in your browser.</h1>
 <script>document.getElementById("nojswarn").style.display = "none"</script>
-<div id="app" class="phone-viewport" v-cloak>
-    <md-whiteframe md-tag="md-toolbar" md-elevation="2" class="md-small">
-        <md-button class="md-icon-button" v-on:click="$refs.nav.toggle()">
-            <md-icon>menu</md-icon>
-        </md-button>
-        <h2 class="md-title" style="flex: 1">{{title}}</h2>
-        <network-status online-icon="" tooltip="Network Offline"></network-status>
-    </md-whiteframe>
-    <md-sidenav class="md-left" ref="nav" v-on:close="stationEditMode = false">
-        <md-toolbar class="md-small">
-            <div class="md-toolbar-container">
-                <h3 class="md-title">{{title}} <sup id="versionInfo">{{version}}</sup></h3>
-                <md-avatar class="md-avatar-icon">
-                    <md-icon>invert_colors</md-icon>
-                </md-avatar>
-            </div>
-        </md-toolbar>
-        <md-list>
-            <!-- Station list -->
-            <md-list-item ref="stationList" class="md-primary">
-                <md-icon>music_note</md-icon>
-                <span>Stations</span>
-                <md-button class="md-icon-button"
-                           v-on:click="stationEditMode = !stationEditMode;
-                            stationEditMode ? openStationList(true) : undefined">
-                    <md-icon>{{stationEditMode ? "done" : "mode_edit"}}</md-icon>
-                </md-button>
-                <md-list-expand>
-                    <md-list>
-                        <div v-if="stationEditMode">
-                            <md-list-item class="md-inset" v-on:click="$refs.stationEditor.open()">
-                                <md-icon>add_circle_outline</md-icon>
-                                <span>Add Station</span>
-                            </md-list-item>
-                            <md-list-item class="md-inset" v-on:click="resetStations()">
-                                <md-icon>restore</md-icon>
-                                <span>Reset Stations</span>
-                            </md-list-item>
-                            <md-list-item class="md-inset" v-for="station in stream.stationList.arr" :key="station.id"
-                                          v-on:click="$refs.stationEditor.open(station.id)">
-                                <span>{{station.title}}</span>
-                                <md-icon>reorder</md-icon>
-                            </md-list-item>
-                        </div>
-                        <md-list-item v-if="!stationEditMode" class="md-inset" v-for="station in stream.stationList.arr"
-                                      :key="station.id" :disabled="station.id === stream.currentStation.id"
-                                      v-on:click="updateRoute(station.id); $refs.nav.toggle()">
-                            <span>{{station.title}}</span>
-                        </md-list-item>
-                    </md-list>
-                </md-list-expand>
-            </md-list-item>
-            <md-list-item class="md-primary">
-                <md-icon>graphic_eq</md-icon>
-                <span>Visualizer</span>
-                <md-switch :disabled="!visualizer.supported" v-model="visualizer.enabled"
-                           class="md-primary"></md-switch>
-            </md-list-item>
-        </md-list>
-        <md-list>
-            <!-- Social links -->
-            <md-list-item class="md-primary">
-                <md-icon>favorite</md-icon>
-                <span>Follow Us</span>
-                <md-list-expand>
-                    <md-list>
-                        <md-list-item class="md-inset" v-for="link in socialLinks" :key="link.name"
-                                      :href="link.url" target="_blank" v-on:click="$refs.nav.toggle()">
-                            <span>{{link.name}}</span>
-                        </md-list-item>
-                    </md-list>
-                </md-list-expand>
-            </md-list-item>
-            <md-list-item v-if="shareSupported" v-on:click="openShareDialog()" class="md-primary">
-                <md-icon>share</md-icon>
-                <span>Share</span>
-            </md-list-item>
-            <md-list-item v-on:click="$refs.nav.toggle()" :href="repoLink" class="md-primary" target="_blank">
-                <md-icon>code</md-icon>
-                <span>Source</span>
-            </md-list-item>
-        </md-list>
-    </md-sidenav>
-    <div class="main-content" v-if="stream.currentStation">
-        <h3>Now playing: {{stream.currentStation.title}}</h3>
-        <p style="white-space: pre-wrap;">{{stream.currentStation.description}}</p>
-    </div>
-    <div id="streamCtrl">
-        <md-button class="md-icon-button md-raised md-dense" v-on:click="$refs.player.changeVolume(-0.1)"
-                   :disabled="player.volume === 0">
-            <md-icon>remove</md-icon>
-        </md-button>
-        <md-button class="md-icon-button md-raised md-dense" v-on:click="$refs.player.changeVolume(0.1)"
-                   :disabled="player.volume === 1">
-            <md-icon>add</md-icon>
-        </md-button>
-        <md-button class="md-fab md-primary" :disabled="player.offline"
-                   v-on:click="$refs.player.play = !player.play">
-            <md-icon>{{player.play ? "pause" : "play_arrow"}}</md-icon>
-            <md-tooltip md-delay="400" md-direction="top">{{player.play ? "Pause" : "Play"}}</md-tooltip>
-        </md-button>
-        <md-button class="md-fab" v-on:click="$refs.player.reload()">
-            <md-icon>refresh</md-icon>
-            <md-tooltip md-delay="400" md-direction="top">Reload</md-tooltip>
-        </md-button>
-    </div>
-    <station-editor ref="stationEditor" :stations="stream.stationList"></station-editor>
-    <stream-player
-            ref="player"
-            :station="stream.currentStation"
-            v-on:error="streamError"
-            v-on:state-change="playerStateChange"
-    ></stream-player>
-    <transition name="vf">
-        <visualizer v-if="visualizer.enabled && visualizer.supported && player.play"
-                    id="visualizer"
-                    design="square"
-                    barcolor="#E91E63"
-                    :audio-context="$refs.player.audioContext"
-                    :media-el-src="$refs.player.mediaElSrc"
-        ></visualizer>
-    </transition>
-    <md-progress id="volumeBar" class="md-accent" :md-progress="player.volume*100"
-                 :md-indeterminate="player.loading">
-    </md-progress>
-    <md-snackbar ref="notification-bar" :md-position="notification.position" :md-duration="notification.duration">
-        <span>{{notification.message}}</span>
-        <md-button v-if="notification.trigger" class="md-accent" @click="notification.trigger.func">
-            {{notification.trigger.text}}
-        </md-button>
-    </md-snackbar>
+<div id="app">
+    <app></app>
 </div>
 <script src="https://stream.liquidradio.pro/stations"></script>
 <script src="dist/bundle.js"></script>
