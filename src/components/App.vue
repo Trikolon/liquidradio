@@ -200,10 +200,10 @@
 
     export default {
         components: {
-            "StreamPlayer": StreamPlayer,
-            "StationEditor": StationEditor,
-            "Visualizer": Visualizer,
-            "NetworkStatus": NetworkStatus
+            StreamPlayer,
+            StationEditor,
+            Visualizer,
+            NetworkStatus
         },
         data() {
             return {
