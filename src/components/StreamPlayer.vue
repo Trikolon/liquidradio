@@ -122,6 +122,7 @@
              * @returns {undefined}
              */
             errorHandler(event) {
+                log.debug("Error handler", event);
                 let message = "Unknown Error";
 
                 const networkState = this.$refs.audioEl.networkState;
@@ -161,9 +162,16 @@
              * @returns {undefined}
              */
             updatePlayState(state) {
+                log.debug("hi");
                 if (state) {
-                    this.$refs.audioEl.play();
-                    log.debug("Started playback");
+                    // Special case 'play': Can fail => Promise handler
+                    this.$refs.audioEl.play().then(() => {
+                        log.debug("Started playback");
+                    }).catch(error => {
+                        log.error("Error while starting playback", error);
+                        this.play = false; // TODO: This could trigger the watcher again, we don't want that
+                        this.$emit("error", error); // TODO: Call local error handler (only one error emit)
+                    })
                 }
                 else {
                     this.$refs.audioEl.pause();

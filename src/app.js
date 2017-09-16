@@ -215,7 +215,7 @@ const app = new Vue({
          * @param {String} message - Human readable error message.
          * @returns {undefined}
          */
-        streamError(event, message) {
+        streamError(event, message = "Unknown Error") {
             log.error("Error in stream", event, message);
             this.notify(`Error: ${message}`, undefined, {
                 text: "Switch Station", func: () => {
