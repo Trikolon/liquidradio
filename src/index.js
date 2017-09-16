@@ -16,7 +16,7 @@ Vue.use(VueRouter);
 const router = new VueRouter({});
 const app = new Vue({
     components: {
-        "App": App
+        App
     },
     router,
     el: "#app"
