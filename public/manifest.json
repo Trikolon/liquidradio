@@ -1,5 +1,6 @@
 {
     "name": "Liquid Radio",
+    "short_name": "L Radio",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -15,5 +16,6 @@
     "theme_color": "#3a4145",
     "background_color": "#3a4145",
     "display": "standalone",
-    "orientation": "portrait"
+    "orientation": "portrait",
+    "start_url": "/"
 }
