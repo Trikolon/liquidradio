@@ -8,10 +8,16 @@ import * as OfflinePluginRuntime from 'offline-plugin/runtime'
 import App from "./components/App.vue"
 
 window.log = loglevel.getLogger("liquidradio"); // Get a custom logger to prevent webpack-dev-server from controlling it
-log.setDefaultLevel(process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG");
+
+if(process.env.NODE_ENV === "production") {
+    log.setDefaultLevel("INFO");
+    OfflinePluginRuntime.install();
+}
+else {
+    log.setDefaultLevel("DEBUG");
+}
 log.debug("%cDebug messages enabled", "background: red; color: yellow; font-size: x-large");
 
-OfflinePluginRuntime.install();
 
 Vue.use(VueMaterial);
 Vue.use(VueRouter);

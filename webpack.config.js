@@ -53,15 +53,7 @@ module.exports = {
         }),
         new CopyWebpackPlugin([
             { from: 'pwa' }
-        ]),
-        new OfflinePlugin({
-            caches: {
-                main: [
-                    "bundle.js",
-                    "index.html"
-                ]
-            }
-        })
+        ])
     ]
 };
 
@@ -77,6 +69,14 @@ if (process.env.NODE_ENV === 'production') { // only add in production
         new BabiliPlugin(),
         new webpack.LoaderOptionsPlugin({
             minimize: true
+        }),
+        new OfflinePlugin({
+            caches: {
+                main: [
+                    "bundle.js",
+                    "index.html"
+                ]
+            }
         })
     ])
 }
