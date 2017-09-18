@@ -162,7 +162,6 @@
              * @returns {undefined}
              */
             updatePlayState(state) {
-                log.debug("hi");
                 if (state) {
                     // Special case 'play': Can fail => Promise handler
                     this.$refs.audioEl.play().then(() => {

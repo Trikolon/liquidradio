@@ -150,9 +150,12 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        height: 90vh;
+        height: 100vh;
         overflow-y: auto;
         overflow-x: hidden;
+
+        background-color: #3a4145;
+        color: white;
     }
     #versionInfo {
         font-size: x-small;
@@ -165,7 +168,7 @@
     }
     #visualizer {
         width: 100%;
-        z-index: -1;
+        /*z-index: -1;*/
         opacity: 0.5;
         max-height: 55vh;
     }
