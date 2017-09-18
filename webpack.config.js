@@ -2,12 +2,15 @@ const path = require("path");
 const webpack = require('webpack');
 const BabiliPlugin = require("babili-webpack-plugin");
 const OfflinePlugin = require("offline-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-    entry: './src/index.js',
+    context: path.resolve("src"),
+    entry: "./index.js",
     output: {
-        path: path.resolve("./public/", 'dist'),
-        publicPath: "/dist/",
+        path: path.resolve('public'),
+        publicPath: "/",
         filename: 'bundle.js'
     },
     module: {
@@ -45,7 +48,20 @@ module.exports = {
         }
     },
     plugins: [
-        new OfflinePlugin()
+        new HtmlWebpackPlugin({
+            template: 'index.html'
+        }),
+        new CopyWebpackPlugin([
+            { from: 'pwa' }
+        ]),
+        new OfflinePlugin({
+            caches: {
+                main: [
+                    "bundle.js",
+                    "index.html"
+                ]
+            }
+        })
     ]
 };
 
