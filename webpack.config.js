@@ -1,6 +1,7 @@
-const path = require('path');
+const path = require("path");
 const webpack = require('webpack');
 const BabiliPlugin = require("babili-webpack-plugin");
+const OfflinePlugin = require("offline-plugin");
 
 module.exports = {
     entry: './src/index.js',
@@ -42,7 +43,10 @@ module.exports = {
         alias: {
             vue$: "vue/dist/vue.esm.js"
         }
-    }
+    },
+    plugins: [
+        new OfflinePlugin()
+    ]
 };
 
 if (process.env.NODE_ENV === 'production') { // only add in production
