@@ -76,7 +76,8 @@ if (process.env.NODE_ENV === 'production') { // only add in production
                     "bundle.js",
                     "index.html"
                 ]
-            }
+            },
+            autoUpdate: true
         })
     ])
 }
