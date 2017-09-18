@@ -406,7 +406,7 @@
             /**
              * Shows notification
              * @param {String} message - Text for notification.
-             * @param {Number} duration - Duration of visibility.
+             * @param {Number|undefined} duration - Duration of visibility.
              * @param {Object} trigger - If set: trigger.text: Button text, trigger.func: Function for button to trigger.
              * @returns {undefined}
              */

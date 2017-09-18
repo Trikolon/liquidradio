@@ -103,6 +103,7 @@ export default class StationList {
     /**
      * Remove Station from array
      * @param {Station|String} station - Station id or station object to be removed from array
+     * @returns {undefined}
      */
     removeStation(station) {
         let index;
@@ -158,6 +159,7 @@ export default class StationList {
 
     /**
      * Save stations to localStorage (if supported)
+     * @returns {undefined}
      */
     save() {
         if (localStorage) {
