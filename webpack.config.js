@@ -52,7 +52,8 @@ module.exports = {
             template: 'index.html'
         }),
         new CopyWebpackPlugin([
-            { from: 'pwa' }
+            { from: 'pwa' },
+            { from: 'assets'}
         ])
     ]
 };

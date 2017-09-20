@@ -85,6 +85,7 @@
             </md-list>
         </md-sidenav>
         <div class="main-content" v-if="stream.currentStation">
+            <img id="logo" src="/logo-white.svg">
             <h3>Now playing: {{stream.currentStation.title}}</h3>
             <p style="white-space: pre-wrap;">{{stream.currentStation.description}}</p>
         </div>
@@ -156,6 +157,9 @@
 
         background-color: #3a4145;
         color: white;
+    }
+    #logo {
+        height: 30%; max-height: 300px;
     }
     #versionInfo {
         font-size: x-small;
