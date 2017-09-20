@@ -151,7 +151,7 @@
                 // Reset error field
                 this.validationError = undefined;
                 try {
-                    const station = this.stations.getStation(this.selectedStation);
+                    const station = this.stations.getStation(this.selectedStation.id);
                     if (station === null) {
                         log.error("Attempted to save station data but could not find station in array by id");
                     }
