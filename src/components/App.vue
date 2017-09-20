@@ -217,7 +217,7 @@
                 loglevel: process.env.NODE_ENV === 'production' ? "INFO" : "DEBUG",
                 title: "Liquid Radio",
                 repoLink: "https://github.com/Trikolon/liquidradio",
-                version: "1.3.0",
+                version: "1.3.1",
                 stream: {
                     currentStation: undefined,
                     stationList: new StationList()
