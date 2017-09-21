@@ -68,7 +68,8 @@
                     <md-list-expand>
                         <md-list>
                             <md-list-item class="md-inset" v-for="link in socialLinks" :key="link.name"
-                                          :href="link.url" target="_blank" v-on:click="$refs.nav.toggle()">
+                                          :href="link.url" target="_blank" rel="noopener"
+                                          v-on:click="$refs.nav.toggle()">
                                 <span>{{link.name}}</span>
                             </md-list-item>
                         </md-list>
@@ -78,7 +79,8 @@
                     <md-icon>share</md-icon>
                     <span>Share</span>
                 </md-list-item>
-                <md-list-item v-on:click="$refs.nav.toggle()" :href="repoLink" class="md-primary" target="_blank">
+                <md-list-item v-on:click="$refs.nav.toggle()" :href="repoLink" class="md-primary" target="_blank"
+                              rel="noopener">
                     <md-icon>code</md-icon>
                     <span>Source</span>
                 </md-list-item>
