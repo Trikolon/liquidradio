@@ -75,7 +75,8 @@ if (process.env.NODE_ENV === 'production') { // only add in production
             caches: {
                 main: [
                     "bundle.js",
-                    "index.html"
+                    "index.html",
+                    "logo-white.svg"
                 ]
             },
             autoUpdate: true
