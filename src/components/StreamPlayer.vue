@@ -8,6 +8,7 @@
 
 <script>
     import Station from "../Station"
+
     export default {
         props: {
             station: {
@@ -21,7 +22,8 @@
                 offline: false,
                 loading: false,
                 audioContext: undefined,
-                mediaElSrc: undefined
+                mediaElSrc: undefined,
+                actionQueue: new Promise(resolve => resolve())
             }
         },
         watch: {
@@ -162,20 +164,28 @@
              * @returns {undefined}
              */
             updatePlayState(state) {
-                if (state) {
-                    // Special case 'play': Can fail => Promise handler
-                    this.$refs.audioEl.play().then(() => {
-                        log.debug("Started playback");
-                    }).catch(error => {
-                        log.error("Error while starting playback", error);
-                        this.play = false; // TODO: This could trigger the watcher again, we don't want that
-                        this.$emit("error", error); // TODO: Call local error handler (only one error emit)
+                log.debug("actionQueue", this.actionQueue);
+                this.actionQueue.then(() => {
+                    this.actionQueue = new Promise(resolve => {
+                        if (state) {
+                            // Special case 'play': Can fail => Promise handler
+                            this.$refs.audioEl.play().then(() => {
+                                log.debug("Started playback");
+                                resolve();
+                            }).catch(error => {
+                                log.error("Error while starting playback", error);
+                                this.play = false; // TODO: This could trigger the watcher again, we don't want that
+                                this.$emit("error", error); // TODO: Call local error handler (only one error emit)
+                                resolve();
+                            })
+                        }
+                        else {
+                            this.$refs.audioEl.pause();
+                            log.debug("Stopped playback");
+                            resolve();
+                        }
                     })
-                }
-                else {
-                    this.$refs.audioEl.pause();
-                    log.debug("Stopped playback");
-                }
+                });
             }
             ,
             /**
