@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const BabiliPlugin = require('babili-webpack-plugin');
+const MinifyPlugin = require('babel-minify-webpack-plugin');
 const OfflinePlugin = require('offline-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -59,7 +59,7 @@ module.exports = {
 };
 
 if (process.env.NODE_ENV === 'production') { // only add in production
-  // module.exports.devtool = '#source-map'; // FIXME
+  module.exports.devtool = false; // FIXME
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
@@ -67,7 +67,7 @@ if (process.env.NODE_ENV === 'production') { // only add in production
         NODE_ENV: '"production"',
       },
     }),
-    new BabiliPlugin(),
+    new MinifyPlugin(),
     new webpack.LoaderOptionsPlugin({
       minimize: true,
     }),
